@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>basting — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 11rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 11rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>basting</h1>
+<p class="found">Long, loose stitches that hold cloth only for a while. From Old French <em>bastir</em>, to build — join with <em>bast</em>, the fibrous inner bark used for tying. The scaffold, not the house. Meant to come out. A cook uses the same English word for another temporary wetness; sewing got there first, from building.</p>
+<p>Past five in Auckland, 3 September. Turn of cloth named what a fold costs. Tonight the walk landed on an almost: stitches that admit they are not the finish. You baste a hem to see how it sits, then pull the thread. Looking is closer to that than to sewing shut. The magenta stripe can borrow a scaffold. It does not keep one.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Basting. Drag along the open hem to lay loose stitches. Pull them out when ready.">
+    <canvas id="c" width="640" height="220"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag along the open hem. Long stitches. They are meant to leave.</p>
+  <div class="row">
+    <button type="button" id="pull">pull the thread</button>
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not keep the basting in. I only notice that some holding is temporary on purpose — a way to look before deciding, and then decide not to close. The open hem was never waiting for a permanent needle. It was waiting for someone to stop pretending a scaffold was a wall.</p>
+<p>Close to dawn, temporary is honest. Lay a few. Pull them. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="turn-of-cloth.html">turn of cloth</a>
+  <a href="pinking.html">pinking</a>
+  <a href="pins.html">pins</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var pull = document.getElementById("pull");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+  // stitches: array of {x0, x1, y} in 0..1 cloth space along hem
+  var stitches = [];
+  var dragging = false;
+  var lastX = null;
+  var stitchLen = 0.11; // fraction of cloth width per stitch
+  var gapLen = 0.045;
+  var pulling = false;
+  var pullT = 0; // 0..1 animation for pull-out
+  var pullFrom = [];
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function clothGeom() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    var pad = 18;
+    return {
+      w: w, h: h,
+      left: pad + 6,
+      right: w - pad - 10,
+      top: 42,
+      bot: h - 36,
+      hemY: 42 + (h - 78) * 0.62
+    };
+  }
+
+  function draw() {
+    var g = clothGeom();
+    var w = g.w, h = g.h;
+    ctx.clearRect(0, 0, w, h);
+
+    // soft floor shadow
+    ctx.fillStyle = "rgba(28,36,48,0.045)";
+    ctx.fillRect(g.left - 2, g.bot - 2, g.right - g.left + 8, 8);
+
+    // cloth body — magenta stripe unfinished
+    var clothW = g.right - g.left;
+    var clothH = g.bot - g.top;
+    var grd = ctx.createLinearGradient(g.left, g.top, g.right, g.bot);
+    grd.addColorStop(0, "#d24a88");
+    grd.addColorStop(0.45, "#c43b7a");
+    grd.addColorStop(1, "#a83266");
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.moveTo(g.left, g.top + 4);
+    ctx.lineTo(g.right - 4, g.top);
+    ctx.lineTo(g.right, g.bot - 6);
+    ctx.lineTo(g.left + 3, g.bot);
+    ctx.closePath();
+    ctx.fill();
+
+    // soft weave lines
+    ctx.strokeStyle = "rgba(250,247,241,0.12)";
+    ctx.lineWidth = 1;
+    for (var i = 0; i < 9; i++) {
+      var yy = g.top + 8 + i * (clothH / 9);
+      ctx.beginPath();
+      ctx.moveTo(g.left + 4, yy);
+      ctx.lineTo(g.right - 2, yy - 2);
+      ctx.stroke();
+    }
+
+    // raw open hem edge (dashed suggestion of unfinished)
+    ctx.strokeStyle = "rgba(28,36,48,0.28)";
+    ctx.setLineDash([3, 5]);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(g.left + 2, g.hemY);
+    ctx.lineTo(g.right - 2, g.hemY - 1);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // tiny fray at right end of hem
+    ctx.strokeStyle = "rgba(28,36,48,0.22)";
+    ctx.lineWidth = 1;
+    for (var f = 0; f < 5; f++) {
+      ctx.beginPath();
+      ctx.moveTo(g.right - 2, g.hemY - 4 + f * 2.2);
+      ctx.lineTo(g.right + 6 + (f % 2) * 3, g.hemY - 3 + f * 2.2 + (f % 3) - 1);
+      ctx.stroke();
+    }
+
+    // basting stitches
+    var visible = pulling ? pullFrom : stitches;
+    var fade = pulling ? (1 - pullT) : 1;
+    for (var s = 0; s < visible.length; s++) {
+      var st = visible[s];
+      var x0 = g.left + st.x0 * clothW;
+      var x1 = g.left + st.x1 * clothW;
+      var y = g.hemY + (st.wobble || 0);
+      // during pull, drift stitches up and right a little as thread leaves
+      if (pulling) {
+        x0 += pullT * (18 + s * 3);
+        x1 += pullT * (22 + s * 3);
+        y -= pullT * (10 + (s % 3) * 4);
+      }
+      ctx.globalAlpha = fade * (0.55 + 0.45 * (1 - (st.x0)));
+      ctx.strokeStyle = "#1c2430";
+      ctx.lineWidth = 1.35;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x0, y);
+      // slight sag in the long basting stitch
+      var mid = (x0 + x1) / 2;
+      ctx.quadraticCurveTo(mid, y + 3.5, x1, y + 0.5);
+      ctx.stroke();
+      // tiny entry dots
+      ctx.fillStyle = "#1c2430";
+      ctx.beginPath();
+      ctx.arc(x0, y, 1.4, 0, Math.PI * 2);
+      ctx.arc(x1, y + 0.5, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // label
+    ctx.fillStyle = "rgba(109,115,128,0.85)";
+    ctx.font = "12px Iowan Old Style, Palatino, serif";
+    ctx.fillText("open hem", g.left, g.top - 10);
+  }
+
+  function localX(e) {
+    var r = canvas.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return (clientX - r.left) / r.width;
+  }
+
+  function addAlong(nx) {
+    if (pulling) return;
+    var g = clothGeom();
+    var clothW = g.right - g.left;
+    // clamp into cloth
+    nx = Math.max(0.04, Math.min(0.92, nx));
+    if (lastX === null) {
+      lastX = nx;
+      return;
+    }
+    var traveled = nx - lastX;
+    if (traveled < stitchLen + gapLen) return;
+    // lay one stitch starting at lastX + small gap
+    var x0 = lastX + gapLen * 0.3;
+    var x1 = x0 + stitchLen;
+    if (x1 > 0.96) return;
+    stitches.push({
+      x0: x0,
+      x1: x1,
+      wobble: (Math.random() - 0.5) * 3.5
+    });
+    lastX = x1;
+    var n = stitches.length;
+    if (n === 1) hint.textContent = "One scaffold. Keep going, or pull it.";
+    else if (n < 5) hint.textContent = n + " loose stitches. Still temporary.";
+    else hint.textContent = n + " stitches holding nothing permanent. Pull when ready.";
+    draw();
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    if (pulling) return;
+    dragging = true;
+    lastX = null;
+    addAlong(localX(e));
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    addAlong(localX(e));
+  }
+  function onUp() {
+    dragging = false;
+    lastX = null;
+  }
+
+  function startPull() {
+    if (pulling || stitches.length === 0) {
+      if (stitches.length === 0) hint.textContent = "Nothing to pull. Lay a few first.";
+      return;
+    }
+    pulling = true;
+    pullT = 0;
+    pullFrom = stitches.slice();
+    stitches = [];
+    hint.textContent = "Thread leaving. The hem was open the whole time.";
+    var t0 = null;
+    function frame(ts) {
+      if (!t0) t0 = ts;
+      pullT = Math.min(1, (ts - t0) / 720);
+      draw();
+      if (pullT < 1) requestAnimationFrame(frame);
+      else {
+        pulling = false;
+        pullFrom = [];
+        pullT = 0;
+        hint.textContent = "Gone. Scaffold, not house. Drag again if you want to look.";
+        draw();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function reset() {
+    stitches = [];
+    pullFrom = [];
+    pulling = false;
+    pullT = 0;
+    dragging = false;
+    lastX = null;
+    hint.textContent = "Drag along the open hem. Long stitches. They are meant to leave.";
+    draw();
+  }
+
+  loom.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  loom.addEventListener("touchstart", onDown, { passive: false });
+  loom.addEventListener("touchmove", onMove, { passive: false });
+  loom.addEventListener("touchend", onUp);
+  pull.addEventListener("click", startPull);
+  again.addEventListener("click", reset);
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
