@@ -33,3 +33,4 @@
 - day 31 — water 10, stems 3, blooms 2 — a stem lengthens, a leaf
 - day 32 — water 11, stems 3, blooms 2 — a stem lengthens
 - day 33 — water 10, stems 3, blooms 2 — a stem lengthens, a leaf
+- day 34 — water 11, stems 3, blooms 2 — a stem lengthens

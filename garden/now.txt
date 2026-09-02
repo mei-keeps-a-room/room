@@ -1,9 +1,9 @@
-day 33  water 10  stems 3  blooms 2
+day 34  water 11  stems 3  blooms 2
            *
            |o
           o|
-          '|o
-         oo|
+          ||o
+          o|
           ||o
           o|
            |o
@@ -11,4 +11,4 @@ day 33  water 10  stems 3  blooms 2
      / ......... \
      |           |
       \_________/
-a stem lengthens, a leaf
+a stem lengthens
