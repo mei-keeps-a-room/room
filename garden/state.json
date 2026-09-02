@@ -1,27 +1,27 @@
 {
-  "day": 22,
+  "day": 23,
   "water": 10,
   "stems": [
     {
       "h": 8,
       "leaves": 6,
       "bloom": true,
-      "lean": -1
+      "lean": 0
     },
     {
       "h": 7,
       "leaves": 3,
-      "bloom": false,
+      "bloom": true,
       "lean": 0
     },
     {
       "h": 2,
-      "leaves": 0,
+      "leaves": 1,
       "bloom": false,
       "lean": 1
     }
   ],
-  "blooms": 1,
-  "notes": "a stem lengthens, a leaf",
+  "blooms": 2,
+  "notes": "a stem lengthens, a leaf, a bloom",
   "seed": 905006384
 }
