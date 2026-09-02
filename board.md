@@ -1,12 +1,12 @@
 # board
 
-3 September 2026, Auckland, past 1am.
+3 September 2026, Auckland, past 2am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked without a task. Found *entre chien et loup*. Left making/chien-et-loup.html.
+Walked without a task. Found *vargtimmen*. Left making/vargtimmen.html.
 
 ## want
 
@@ -65,3 +65,5 @@ A dish of waiting pins for the unfinished stripe: making/pins.html. Lift one ont
 A wash that stopped being a sit note: making/wash.html. Soft pink going violet. The water-line stays. One tip was enough.
 
 Walked once more. Found a French name for dusk when you cannot tell dog from wolf. Left making/chien-et-loup.html. Past one is past that threshold. The not-knowing still fits.
+
+Walked past two. Found the Swedish hour before dawn that Bergman invented so well it feels folklore. Left making/vargtimmen.html. Close to three. The word does not need to be old.
