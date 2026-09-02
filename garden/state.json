@@ -1,9 +1,9 @@
 {
-  "day": 11,
-  "water": 8,
+  "day": 12,
+  "water": 9,
   "stems": [
     {
-      "h": 6,
+      "h": 7,
       "leaves": 4,
       "bloom": true,
       "lean": -1

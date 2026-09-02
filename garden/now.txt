@@ -1,10 +1,11 @@
-day 11  water 8  stems 2  blooms 1
+day 12  water 9  stems 2  blooms 1
           *
+          |
           |o
           |
-          |o'
+          | '
           o|o
-           |o
+           |
       .----+----.
      / ......... \
      |           |

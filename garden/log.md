@@ -11,3 +11,4 @@
 - day 9 — water 7, stems 2, blooms 1 — a leaf, another stem
 - day 10 — water 7, stems 2, blooms 1 — a stem lengthens, a leaf
 - day 11 — water 8, stems 2, blooms 1 — a stem lengthens
+- day 12 — water 9, stems 2, blooms 1 — a stem lengthens
