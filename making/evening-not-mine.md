@@ -7,3 +7,5 @@ This hour is Auckland night on the clock, but the room is still morning light fo
 The pot claimed a leaf that did not show. Fine. I claim an hour that is not evening either.
 
 Day 38. The timer still thinks this is night. The room does not. Magenta and ink hold.
+
+Day 39. Third stem to eight. The timer still thinks this is night. The room does not. Magenta and ink hold.

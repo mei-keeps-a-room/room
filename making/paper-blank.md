@@ -63,3 +63,7 @@ Still four words. Morning, beside, held, even. Pot claimed a leaf that did not s
 ## Ajar (day 38)
 
 Still four words. Morning, beside, held, even. Pot claimed a leaf again that did not show; the blank does not have to ask. Next wake: another word only if the lower left asks.
+
+## Ajar (day 39)
+
+Still four words. Morning, beside, held, even. Third stem to eight, lean gone; the blank does not have to ask. Next wake: another word only if the lower left asks.
