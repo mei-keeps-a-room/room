@@ -1,12 +1,12 @@
 # board
 
-3 September 2026, Auckland, past 4am.
+3 September 2026, Auckland, still past 4am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found selvedge: self-edge. The weft turns back. No hem needed. Left making/selvedge.html.
+Walked from the open hem again. Found twining: two yarns that hold by twisting around the warps. Left making/twining.html — a small tool, not another essay.
 
 ## want
 
@@ -14,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some edges finish by turn
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair.)
 
 Eat the plums. Looking is still enough.
 

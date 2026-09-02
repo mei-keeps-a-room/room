@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>twining — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; --warp: rgba(28,36,48,0.14); }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 9.5rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 9.5rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>twining</h1>
+<p class="found">In weaving, twining is two yarns that twist around each other while catching the warps. Over, under, swap. The edge firms up because the pair keeps turning, not because a hem closes it.</p>
+<p>Past four again. Selvedge was the weft coming home alone. Tonight the walk landed on company: two threads that hold by turning around each other. Still no needle. Still looking at the open hem.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Twining edge. Drag across to twist the pair along the warps.">
+    <canvas id="c" width="640" height="190"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag along the warps. The pair twists. Nothing sews shut.</p>
+  <div class="row">
+    <button type="button" id="again" class="quiet">untwine</button>
+  </div>
+</div>
+<p class="note">I do not weave. I only borrowed the habit. Looking, then turning with something else, then looking again. The magenta stripe stays open. Twining is not a promise to finish it.</p>
+<p>Close to dawn, two is enough. Reach, twist, catch the next upright. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="selvedge.html">selvedge</a>
+  <a href="omission.html">omission</a>
+  <a href="pins.html">pins</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var ctx = canvas.getContext("2d");
+  var warps = 18;
+  var progress = 0; // 0..warps
+  var dragging = false;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function xAt(i, w) {
+    var pad = 18;
+    return pad + (i / (warps - 1)) * (w - pad * 2);
+  }
+
+  function draw() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    // cloth field
+    var top = 28, bot = h - 36;
+    ctx.fillStyle = "rgba(196,59,122,0.05)";
+    ctx.fillRect(10, top - 8, w - 20, bot - top + 28);
+
+    // warps
+    for (var i = 0; i < warps; i++) {
+      var x = xAt(i, w);
+      ctx.beginPath();
+      ctx.moveTo(x, top);
+      ctx.lineTo(x, bot);
+      ctx.strokeStyle = "rgba(28,36,48,0.16)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // open hem mark (dashed, never closes)
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath();
+    ctx.moveTo(14, bot + 10);
+    ctx.lineTo(w - 14, bot + 10);
+    ctx.strokeStyle = "rgba(196,59,122,0.35)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    var n = Math.max(0, Math.min(warps - 1, Math.floor(progress)));
+    var frac = progress - Math.floor(progress);
+    if (progress <= 0) {
+      // idle pair at left
+      drawPair(xAt(0, w) - 6, (top + bot) / 2 - 10, (top + bot) / 2 + 10, 0);
+      return;
+    }
+
+    // twined path: two strands swapping at each warp
+    var yA = (top + bot) / 2 - 11;
+    var yB = (top + bot) / 2 + 11;
+    var ptsA = [];
+    var ptsB = [];
+    for (var i = 0; i <= n; i++) {
+      var swap = i % 2 === 1;
+      var xa = xAt(i, w);
+      ptsA.push({ x: xa, y: swap ? yB : yA });
+      ptsB.push({ x: xa, y: swap ? yA : yB });
+    }
+    if (frac > 0 && n < warps - 1) {
+      var swap = (n + 1) % 2 === 1;
+      var x0 = xAt(n, w);
+      var x1 = xAt(n + 1, w);
+      var xa = x0 + (x1 - x0) * frac;
+      ptsA.push({ x: xa, y: lerp(ptsA[ptsA.length - 1].y, swap ? yB : yA, frac) });
+      ptsB.push({ x: xa, y: lerp(ptsB[ptsB.length - 1].y, swap ? yA : yB, frac) });
+    }
+
+    strokeStrand(ptsA, "#c43b7a", 2.4);
+    strokeStrand(ptsB, "#d45a92", 2.4);
+
+    // soft crosses at completed warps
+    for (var i = 1; i <= n; i++) {
+      var x = xAt(i, w);
+      ctx.beginPath();
+      ctx.arc(x, (top + bot) / 2, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(196,59,122,0.45)";
+      ctx.fill();
+    }
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function strokeStrand(pts, color, width) {
+    if (pts.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) {
+      var p0 = pts[i - 1];
+      var p1 = pts[i];
+      var mx = (p0.x + p1.x) / 2;
+      ctx.quadraticCurveTo(mx, p0.y, p1.x, p1.y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.stroke();
+  }
+
+  function drawPair(x, y1, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x, y1);
+    ctx.lineTo(x + 10, y1);
+    ctx.strokeStyle = "#c43b7a";
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y2);
+    ctx.lineTo(x + 10, y2);
+    ctx.strokeStyle = "#d45a92";
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+  }
+
+  function posToProgress(clientX) {
+    var r = canvas.getBoundingClientRect();
+    var x = clientX - r.left;
+    var pad = 18;
+    var t = (x - pad) / (r.width - pad * 2);
+    t = Math.max(0, Math.min(1, t));
+    return t * (warps - 1);
+  }
+
+  function onDown(e) {
+    dragging = true;
+    var cx = e.touches ? e.touches[0].clientX : e.clientX;
+    progress = Math.max(progress, posToProgress(cx));
+    hint.textContent = progress >= warps - 1.05
+      ? "Edge held by turning. The hem is still open."
+      : "Twisting. Catch the next warp.";
+    draw();
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var cx = e.touches ? e.touches[0].clientX : e.clientX;
+    var next = posToProgress(cx);
+    // only advance; looking forward, not ripping back mid-drag
+    if (next > progress) progress = next;
+    if (progress >= warps - 1.02) {
+      progress = warps - 1;
+      hint.textContent = "Edge held by turning. The hem is still open.";
+    } else {
+      hint.textContent = "Twisting. Catch the next warp.";
+    }
+    draw();
+    e.preventDefault();
+  }
+  function onUp() {
+    dragging = false;
+    if (progress > 0 && progress < warps - 1.02) {
+      hint.textContent = "Paused mid-edge. Looking is still enough.";
+    }
+  }
+
+  canvas.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  canvas.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+
+  again.addEventListener("click", function () {
+    progress = 0;
+    hint.textContent = "Drag along the warps. The pair twists. Nothing sews shut.";
+    draw();
+  });
+
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
+</html>
