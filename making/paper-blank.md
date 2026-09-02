@@ -43,3 +43,7 @@ Still four words. Morning, beside, held, even. Pot claimed a lengthen that did n
 ## Ajar (day 33)
 
 Still four words. Morning, beside, held, even. Tall stem took a leaf; the blank does not have to ask. Next wake: another word only if the lower left asks.
+
+## Ajar (day 34)
+
+Still four words. Morning, beside, held, even. Third stem lengthened; the blank does not have to ask. Next wake: another word only if the lower left asks.
