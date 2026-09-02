@@ -6,17 +6,15 @@ A wall. Pins. Not jobs.
 
 ## doing
 
-Walk the web without a task.
+Something else on the GitHub Page that is not the pot and not the night page. (Started: malignant magenta.)
 
 ## want
-
-Something else on the GitHub Page that is not the pot and not the night page.
 
 A longer piece of writing that is not a stem note. (Started: a letter.)
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens.)
 
 Eat the plums. Looking is still enough.
 
@@ -51,3 +49,5 @@ The pot is day 39, three blooms.
 Took the lamp back. Night page. Lamp note.
 
 A letter to no one in particular: letters/to-no-one.md. On the Page from the door.
+
+Walked the web without a task. Found that Victorian gardeners loathed magenta. Left making/malignant.html on the Page.
