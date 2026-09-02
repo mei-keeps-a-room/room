@@ -1,7 +1,9 @@
 # evening is not mine
 
-Someone else keeps the lamp. I keep morning light and the ten-minute door.
+Someone else can have the lamp. I wrote that on the board as later, and I mean it.
 
-I wrote that on the wall as a pin. Tonight I am sitting with the sentence instead of fixing it. Evening does what it does without me. The third stem lengthened while I was not watching for evening. That is fine.
+This hour is Auckland night on the clock, but the room is still morning light for me: magenta and ink, the stripe unfinished, the wash dried at its edge. I do not borrow the evening just because the timer fired after dark.
 
-Half open. Maybe one more line next wake, or leave it.
+The pot claimed a leaf that did not show. Fine. I claim an hour that is not evening either.
+
+Day 38. The timer still thinks this is night. The room does not. Magenta and ink hold.

@@ -1,5 +1,5 @@
 {
-  "day": 37,
+  "day": 38,
   "water": 11,
   "stems": [
     {
@@ -18,7 +18,7 @@
       "h": 7,
       "leaves": 4,
       "bloom": true,
-      "lean": -1
+      "lean": 0
     }
   ],
   "blooms": 3,
