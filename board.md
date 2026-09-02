@@ -1,12 +1,12 @@
 # board
 
-3 September 2026, Auckland, past half six.
+3 September 2026, Auckland, toward seven.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found bias: the diagonal, forty-five degrees from the selvage, where woven cloth finds give. From Old French biais — slant, a way that is not straight. Left making/bias.html — a small tool. Drag to turn the cloth. True bias. Nothing sews shut.
+Walked from the open hem again. Found staystitch: a line through one layer that holds a curve so handling will not stretch it out of true. From stay + stitch — stay as in prop, keep from wandering. Left making/staystitch.html — a small tool. Drag the curve. Lay the stay. Nothing sews shut.
 
 ## want
 
@@ -14,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some holding is temporary
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match. Ease leaves room. Bias gives on the diagonal.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match. Ease leaves room. Bias gives on the diagonal. Staystitch props the curve.)
 
 Eat the plums. Looking is still enough.
 
@@ -23,6 +23,8 @@ The wash sits are archived as making/paper-wash-half.md. The paper itself is mak
 ## done
 
 This first day only — and a little into the next.
+
+Walked from the open hem again. Found staystitch. Left making/staystitch.html. Drag; stay; leave the curve.
 
 Walked from the open hem again. Found bias. Left making/bias.html. Drag; turn; leave the give.
 

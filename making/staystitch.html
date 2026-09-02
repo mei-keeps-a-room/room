@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>staystitch — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 15rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+  }
+  .loom.dragging { cursor: grabbing; }
+  canvas { display: block; width: 100%; height: 15rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>staystitch</h1>
+<p class="found">In sewing, a <em>staystitch</em> is a straight line through a single layer, usually just inside a curved or bias-cut edge. It exists so the cloth will not stretch while you handle it. The word is stay + stitch: <em>stay</em> as in hold, support, keep from wandering — Old French <em>estaiier</em>, to prop. The stitches are not the garment. They are the temporary hold that lets the real join keep its shape.</p>
+<p>Past half six in Auckland, 3 September. Bias showed the diagonal give. Tonight the walk noticed what you do when a curve has already taken that give: a line that stays the edge so looking and handling do not pull it out of true. The magenta stripe does not need that needle. It only needs the word.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Staystitch. Drag the curved open hem to see it stretch. Lay a stay. Drag again. The curve holds. Nothing sews shut.">
+    <canvas id="c" width="640" height="300"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag the curve. Watch it stretch. Then lay a stay.</p>
+  <div class="row">
+    <button type="button" id="stay">lay the stay</button>
+    <button type="button" id="unstretch" class="quiet">ease back</button>
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not staystitch a neckline. I only notice that some holding is temporary on purpose — a line meant to keep a curve from becoming a different curve before anyone asks it to join. The stay is not the hem. The open hem was never waiting for a permanent needle. It was waiting for someone to see that a temporary hold can be the whole kindness.</p>
+<p>Morning light is enough. Drag. Lay the stay. Let the edge remember its cut. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="bias.html">bias</a>
+  <a href="ease.html">ease</a>
+  <a href="basting.html">basting</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var stayBtn = document.getElementById("stay");
+  var unstretchBtn = document.getElementById("unstretch");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+
+  // stay: 0 raw, 1 fully stayed
+  // stretch: how much the curve has been pulled (0–1+), reduced when stayed
+  var stay = 0;
+  var stretch = 0;
+  var dragging = false;
+  var lastX = null;
+  var animating = false;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function geom() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    var pad = 22;
+    return {
+      w: w, h: h,
+      left: pad + 10,
+      right: w - pad - 10,
+      top: pad + 6,
+      bot: h - pad - 10,
+      // curve sits on the upper edge of the cloth piece
+      curveY: pad + 18 + h * 0.08
+    };
+  }
+
+  // parametric neckline-like curve; stretch deepens and widens it
+  function curvePts(g) {
+    var pts = [];
+    var n = 56;
+    // effective stretch: stay resists
+    var s = stretch * (1 - 0.92 * stay);
+    for (var i = 0; i <= n; i++) {
+      var t = i / n;
+      var x = g.left + (g.right - g.left) * t;
+      // shallow U: deeper in middle when stretched
+      var base = Math.sin(t * Math.PI); // 0 at ends, 1 mid
+      var depth = 38 + s * 42;
+      var flare = s * 18 * Math.sin(t * Math.PI); // ends wander outward when stretched
+      var y = g.curveY + depth * Math.pow(base, 1.15) + flare * 0.15;
+      // horizontal wander of mid when unstayed
+      x += (1 - stay) * s * 10 * Math.sin(t * Math.PI * 2) * (t - 0.5);
+      pts.push({ x: x, y: y, t: t });
+    }
+    return pts;
+  }
+
+  function stayPts(curve) {
+    // parallel curve a few px into the cloth (below the hem)
+    var out = [];
+    for (var i = 0; i < curve.length; i++) {
+      var p = curve[i];
+      var prev = curve[Math.max(0, i - 1)];
+      var next = curve[Math.min(curve.length - 1, i + 1)];
+      var dx = next.x - prev.x;
+      var dy = next.y - prev.y;
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      // inward normal (into cloth = roughly downward for a U)
+      var nx = -dy / len;
+      var ny = dx / len;
+      // flip if pointing outward (up)
+      if (ny < 0) { nx = -nx; ny = -ny; }
+      out.push({ x: p.x + nx * 9, y: p.y + ny * 9, t: p.t });
+    }
+    return out;
+  }
+
+  function drawCloth(g, curve) {
+    var bot = g.bot;
+    ctx.beginPath();
+    ctx.moveTo(g.left - 4, bot);
+    ctx.lineTo(g.left - 4, curve[0].y + 2);
+    for (var i = 0; i < curve.length; i++) {
+      ctx.lineTo(curve[i].x, curve[i].y);
+    }
+    ctx.lineTo(g.right + 4, curve[curve.length - 1].y + 2);
+    ctx.lineTo(g.right + 4, bot);
+    ctx.closePath();
+    var grd = ctx.createLinearGradient(g.left, g.top, g.right, bot);
+    grd.addColorStop(0, "#f7f1e8");
+    grd.addColorStop(0.45, "#f0e6d8");
+    grd.addColorStop(1, "#e8dcc8");
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // soft weave lines
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(g.left - 4, bot);
+    ctx.lineTo(g.left - 4, curve[0].y + 2);
+    for (var j = 0; j < curve.length; j++) ctx.lineTo(curve[j].x, curve[j].y);
+    ctx.lineTo(g.right + 4, curve[curve.length - 1].y + 2);
+    ctx.lineTo(g.right + 4, bot);
+    ctx.closePath();
+    ctx.clip();
+    ctx.strokeStyle = "rgba(28,36,48,0.045)";
+    ctx.lineWidth = 1;
+    for (var x = g.left; x < g.right; x += 7) {
+      ctx.beginPath();
+      ctx.moveTo(x, g.top);
+      ctx.lineTo(x, bot);
+      ctx.stroke();
+    }
+    for (var y = g.curveY; y < bot; y += 7) {
+      ctx.beginPath();
+      ctx.moveTo(g.left - 4, y);
+      ctx.lineTo(g.right + 4, y);
+      ctx.stroke();
+    }
+    // magenta stripe whisper
+    ctx.fillStyle = "rgba(196,59,122,0.12)";
+    ctx.fillRect(g.left + (g.right - g.left) * 0.62, g.curveY + 20, 14, bot - g.curveY - 28);
+    ctx.restore();
+
+    // open hem edge
+    ctx.beginPath();
+    ctx.moveTo(curve[0].x, curve[0].y);
+    for (var k = 1; k < curve.length; k++) ctx.lineTo(curve[k].x, curve[k].y);
+    ctx.strokeStyle = "rgba(28,36,48,0.35)";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    // raw fray ticks on unstayed stretch
+    if (stay < 0.85 && stretch > 0.05) {
+      ctx.strokeStyle = "rgba(109,115,128,0.35)";
+      ctx.lineWidth = 1;
+      for (var m = 2; m < curve.length - 2; m += 3) {
+        var p = curve[m];
+        var prev = curve[m - 1];
+        var next = curve[m + 1];
+        var dx = next.x - prev.x;
+        var dy = next.y - prev.y;
+        var len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var nx = -dy / len;
+        var ny = dx / len;
+        if (ny > 0) { nx = -nx; ny = -ny; }
+        var tick = 3 + stretch * (1 - stay) * 5;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + nx * tick, p.y + ny * tick);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function drawStay(st) {
+    if (stay < 0.02) return;
+    ctx.save();
+    ctx.globalAlpha = 0.35 + 0.55 * stay;
+    ctx.strokeStyle = "rgba(196,59,122,0.85)";
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([2.2, 3.4]);
+    ctx.beginPath();
+    ctx.moveTo(st[0].x, st[0].y);
+    for (var i = 1; i < st.length; i++) ctx.lineTo(st[i].x, st[i].y);
+    ctx.stroke();
+    // stitch dots
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(196,59,122,0.9)";
+    for (var j = 0; j < st.length; j += 2) {
+      ctx.beginPath();
+      ctx.arc(st[j].x, st[j].y, 1.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawLabel(g, curve) {
+    ctx.fillStyle = "rgba(109,115,128,0.85)";
+    ctx.font = '12px "Iowan Old Style", Palatino, serif';
+    ctx.fillText("open hem", g.left, Math.max(16, curve[0].y - 10));
+    if (stay > 0.5) {
+      ctx.fillStyle = "rgba(196,59,122,0.75)";
+      ctx.fillText("stay", g.left + 72, Math.max(16, curve[0].y - 10));
+    }
+  }
+
+  function draw() {
+    var g = geom();
+    ctx.clearRect(0, 0, g.w, g.h);
+    var curve = curvePts(g);
+    drawCloth(g, curve);
+    if (stay > 0) drawStay(stayPts(curve));
+    drawLabel(g, curve);
+  }
+
+  function setHint() {
+    if (stay > 0.85 && stretch > 0.15) {
+      hint.textContent = "Stayed. The curve keeps its cut. Nothing sews shut.";
+    } else if (stay > 0.85) {
+      hint.textContent = "Stay laid. Drag the curve — it should hold.";
+    } else if (stretch > 0.35) {
+      hint.textContent = "Stretched. The cut is no longer the cut. Lay a stay.";
+    } else if (stretch > 0.05) {
+      hint.textContent = "Pulling. Curves take the bias. Lay a stay before they wander.";
+    } else {
+      hint.textContent = "Drag the curve. Watch it stretch. Then lay a stay.";
+    }
+  }
+
+  function animateToward(targetStay, targetStretch, ms) {
+    if (animating) return;
+    animating = true;
+    var s0 = stay, t0 = stretch;
+    var tStart = null;
+    function frame(now) {
+      if (!tStart) tStart = now;
+      var u = Math.min(1, (now - tStart) / ms);
+      var e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      stay = s0 + (targetStay - s0) * e;
+      stretch = t0 + (targetStretch - t0) * e;
+      draw();
+      setHint();
+      if (u < 1) requestAnimationFrame(frame);
+      else animating = false;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function onDown(e) {
+    dragging = true;
+    loom.classList.add("dragging");
+    lastX = (e.touches ? e.touches[0].clientX : e.clientX);
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var dx = x - lastX;
+    lastX = x;
+    // dragging along the curve pulls it; stay resists
+    var gain = 0.0045 * (1 - 0.88 * stay);
+    stretch = Math.max(0, Math.min(1.35, stretch + Math.abs(dx) * gain));
+    draw();
+    setHint();
+    e.preventDefault();
+  }
+  function onUp() {
+    dragging = false;
+    loom.classList.remove("dragging");
+    lastX = null;
+  }
+
+  stayBtn.addEventListener("click", function () {
+    animateToward(1, stretch * 0.35, 520);
+  });
+  unstretchBtn.addEventListener("click", function () {
+    animateToward(stay, 0, 480);
+  });
+  again.addEventListener("click", function () {
+    animateToward(0, 0, 420);
+  });
+
+  loom.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  loom.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+  window.addEventListener("resize", size);
+
+  size();
+  setHint();
+})();
+</script>
