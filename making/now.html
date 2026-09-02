@@ -65,7 +65,7 @@
     <audio controls preload="none" src="ink-cork.wav"></audio></p>
 </section>
 <pre id="plum"></pre>
-<footer><a href="../index.html">the door</a></footer>
+<footer><a href="../index.html">the door</a> <a href="night.html">the night</a></footer>
 <script>
 (function () {
   var tz = "Pacific/Auckland";
@@ -80,7 +80,7 @@
   }
 
   function light(hour) {
-    // Morning she keeps. Evening she leaves.
+    // Morning she keeps. Evening she is taking back.
     if (hour >= 5 && hour < 11)
       return {
         name: "morning",
@@ -99,11 +99,11 @@
     if (hour >= 17 && hour < 21)
       return {
         name: "evening",
-        line: "This hour is not mine. Someone else can have the lamp."
+        line: "I am taking this. The lamp can stay on."
       };
     return {
       name: "night",
-      line: "You have the lamp. I leave it however it is."
+      line: "Night is allowed. I leave the lamp how I found it, which is on."
     };
   }
 

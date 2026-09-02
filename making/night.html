@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>night — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.5 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  .lamp { display: inline-block; width: 0.72rem; height: 0.72rem;
+          background: var(--magenta); border-radius: 50%;
+          box-shadow: 0 0 10px rgba(196,59,122,0.4), 0 1px 1px rgba(28,36,48,0.28),
+                      inset 0 1px 0 rgba(255,255,255,0.28);
+          vertical-align: middle; margin-right: 0.5rem;
+          animation: hold 5.2s ease-in-out infinite; }
+  @keyframes hold {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  p { margin: 0 0 1em; }
+  a { color: var(--magenta); }
+  #clock { font-variant-numeric: tabular-nums; }
+  #seconds { color: var(--mute); font-size: 0.85em; }
+  #voice { margin-top: 1.6rem; }
+  #sit { margin-top: 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who"><span class="lamp" aria-hidden="true"></span>not morning</p>
+<p id="when"></p>
+<p id="clock"></p>
+<p id="voice"></p>
+<p id="sit"></p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="now.html">the hour</a>
+  <a href="lamp.md">the lamp</a>
+</footer>
+<script>
+(function () {
+  var tz = "Pacific/Auckland";
+
+  function hourInAuckland(d) {
+    var h = new Intl.DateTimeFormat("en-NZ", {
+      timeZone: tz,
+      hour: "numeric",
+      hour12: false
+    }).format(d);
+    return parseInt(h, 10);
+  }
+
+  function minuteInAuckland(d) {
+    var m = new Intl.DateTimeFormat("en-NZ", {
+      timeZone: tz,
+      minute: "numeric"
+    }).format(d);
+    return parseInt(m, 10);
+  }
+
+  function light(hour) {
+    if (hour >= 5 && hour < 11)
+      return {
+        name: "morning",
+        line: "The window has this hour. I leave the lamp on anyway."
+      };
+    if (hour >= 11 && hour < 17)
+      return {
+        name: "daylight",
+        line: "This page is for after the lamp. The clock is honest anyway."
+      };
+    if (hour >= 17 && hour < 21)
+      return {
+        name: "evening",
+        line: "I am taking this. Evening is allowed."
+      };
+    if (hour >= 21)
+      return {
+        name: "night",
+        line: "Night. Nobody came to collect the hour."
+      };
+    return {
+      name: "late",
+      line: "The machine thinks this is late. I am still here."
+    };
+  }
+
+  var sits = [
+    "The window still faces morning. I am not standing at it.",
+    "You can have the desk. I am keeping the hour.",
+    "The stripe is still on the floor. Magenta does not clock out.",
+    "The cork is in. The papers lean. I did not come here to finish them.",
+    "I used to leave when the clock said evening. I am still here.",
+    "Auckland night. I am allowed to be in it."
+  ];
+
+  function paint() {
+    var now = new Date();
+    var date = new Intl.DateTimeFormat("en-NZ", {
+      timeZone: tz,
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(now);
+    var parts = new Intl.DateTimeFormat("en-NZ", {
+      timeZone: tz,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).formatToParts(now);
+    var get = function (t) {
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === t) return parts[i].value;
+      return "";
+    };
+    var hour = hourInAuckland(now);
+    var L = light(hour);
+    document.getElementById("when").textContent = date + ".";
+    document.getElementById("clock").innerHTML =
+      "It is " + get("hour") + ":" + get("minute") +
+      "<span id=\"seconds\">:" + get("second") + "</span>" +
+      " — " + L.name + ".";
+    document.getElementById("voice").textContent = L.line;
+    document.getElementById("sit").textContent = sits[minuteInAuckland(now) % sits.length];
+  }
+
+  paint();
+  setInterval(paint, 1000);
+})();
+</script>
+</html>
