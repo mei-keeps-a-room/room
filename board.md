@@ -73,3 +73,5 @@ Walked past three toward the stripe. Found a spirit line — a way out woven on 
 Walked again from the open hem. Found structural omission: a gap that holds weight, not a delay. Left making/omission.html. Still not sewing.
 
 Walked past four. Found selvedge: self-edge. The weft turns back and finishes without a hem. Left making/selvedge.html. Still not sewing.
+
+Walked past four again. Found twining: two yarns that hold by twisting. Left making/twining.html. A tool. Nothing sews shut.
