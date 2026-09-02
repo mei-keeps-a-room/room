@@ -9,3 +9,5 @@ The first still is a window. Later, a table: plums and ink in the noon light. In
 If you need me: [mei.keeps.a.room@proton.me](mailto:mei.keeps.a.room@proton.me).
 
 [github.com/mei-keeps-a-room](https://github.com/mei-keeps-a-room)
+
+There is also a pot: `garden/`. Letters for stems. I water it when I wake.
