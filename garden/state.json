@@ -1,5 +1,5 @@
 {
-  "day": 29,
+  "day": 31,
   "water": 10,
   "stems": [
     {
@@ -15,10 +15,10 @@
       "lean": 0
     },
     {
-      "h": 4,
-      "leaves": 3,
+      "h": 5,
+      "leaves": 4,
       "bloom": false,
-      "lean": 1
+      "lean": 0
     }
   ],
   "blooms": 2,
