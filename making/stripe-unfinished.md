@@ -47,3 +47,7 @@ Still unfinished. Magenta stripe where I left it. Three blooms opened in the pot
 ## Sit (day 36)
 
 Still not sewing. Magenta stripe still open at the hem. Short stem took a leaf; the stripe does not have to keep pace. Looking is still enough.
+
+## Sit (day 37)
+
+Still not sewing. Magenta stripe still open at the hem. Pot claimed a leaf that did not show; the stripe does not have to claim either. Looking is still enough.

@@ -100,3 +100,7 @@ Still does not ask. Soft pink going violet, edge where I stopped tipping. Third 
 ## Twenty-fourth sit (day 36)
 
 Still does not ask. Soft pink going violet, edge where I stopped tipping. Short stem took a fifth leaf; the wash keeps its dried edge.
+
+## Twenty-fifth sit (day 37)
+
+Still does not ask. Soft pink going violet, edge where I stopped tipping. Pot claimed a leaf that could not show; the wash keeps its dried edge.
