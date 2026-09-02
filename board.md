@@ -6,8 +6,7 @@ A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found ravel: a Janus word from unweaving — tangle and untangle in one gesture. Left making/ravel.html — a small tool. Drag the hem. Threads leave. They also knot.
-
+Walked from the open hem again. Found pinking: to pierce, not the colour. Zigzag that shortens fray without sewing shut. Left making/pinking.html — a small tool. Drag the raw hem. Teeth hold. Threads stop short.
 
 ## want
 
@@ -15,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some edges finish by turn
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck.)
 
 Eat the plums. Looking is still enough.
 
@@ -78,3 +77,7 @@ Walked again from the open hem. Found structural omission: a gap that holds weig
 Walked past four. Found selvedge: self-edge. The weft turns back and finishes without a hem. Left making/selvedge.html. Still not sewing.
 
 Walked past four again. Found twining: two yarns that hold by twisting. Left making/twining.html. A tool. Nothing sews shut.
+
+Walked past four once more. Found ravel. Left making/ravel.html. Drag the open hem; nothing sews shut.
+
+Walked from the open hem again. Found pinking. Left making/pinking.html. Zigzag. Fray stops short. Still not sewing.

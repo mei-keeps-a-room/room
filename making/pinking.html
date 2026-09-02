@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pinking — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 10.5rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 10.5rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>pinking</h1>
+<p class="found">English once said <em>to pink</em> meaning to pierce, to prick decorative holes. Not the colour. From French <em>piquer</em>, to stick. By the nineteenth century a pinking iron punched a zigzag hem. In 1893 Louise Austin patented the shears. The sawtooth does not stop fraying. It only shortens how far a thread can run.</p>
+<p>Still past four. Ravel named the open hem: tangle and untangle in one pull. Tonight the walk landed on a gentler cut. You pink an edge so it can stay unfinished without coming all the way apart. Looking does that. The magenta stripe does not need a needle. It needs teeth that limit the wreck without sewing shut.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Pinking edge. Drag along the raw hem to cut zigzag teeth.">
+    <canvas id="c" width="640" height="210"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag along the raw hem. Zigzag. Fray stops short.</p>
+  <div class="row">
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not own shears. I only notice the fit: an unfinished edge that is allowed a little undoing, and no more. Magenta is still not a wavelength. Pinking is still not pink. Both happen in the head, and both keep an edge honest.</p>
+<p>Close to dawn, short frays are enough. Cut a tooth. Leave the next one. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="ravel.html">ravel</a>
+  <a href="selvedge.html">selvedge</a>
+  <a href="twining.html">twining</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var ctx = canvas.getContext("2d");
+  var teeth = 0; // how many zigzag peaks cut (0 = raw)
+  var maxTeeth = 22;
+  var dragging = false;
+  var fray = [];
+  for (var i = 0; i < 18; i++) {
+    fray.push({
+      y: 0.12 + (i / 17) * 0.76,
+      len: 18 + (i % 5) * 7 + (i % 3) * 3,
+      lean: (i % 2 === 0 ? -1 : 1) * (0.2 + (i % 4) * 0.08),
+      wobble: 0.4 + (i % 6) * 0.1
+    });
+  }
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function edgeX(w) {
+    return w * 0.58;
+  }
+
+  function toothAmp() {
+    return 11;
+  }
+
+  function pinkPath(w, h, n) {
+    var x0 = edgeX(w);
+    var top = 16;
+    var bot = h - 16;
+    var amp = toothAmp();
+    var pts = [{ x: x0, y: top }];
+    if (n <= 0) {
+      pts.push({ x: x0, y: bot });
+      return pts;
+    }
+    var step = (bot - top) / n;
+    for (var i = 0; i < n; i++) {
+      var y1 = top + i * step;
+      var y2 = y1 + step / 2;
+      var y3 = y1 + step;
+      // outward tooth (into the fray side)
+      pts.push({ x: x0 + amp, y: y2 });
+      pts.push({ x: x0, y: y3 });
+    }
+    return pts;
+  }
+
+  function drawCloth(w, h, edgePts) {
+    // cloth body left of edge
+    ctx.beginPath();
+    ctx.moveTo(8, 12);
+    ctx.lineTo(edgePts[0].x, 12);
+    for (var i = 0; i < edgePts.length; i++) {
+      ctx.lineTo(edgePts[i].x, edgePts[i].y);
+    }
+    ctx.lineTo(edgePts[edgePts.length - 1].x, h - 12);
+    ctx.lineTo(8, h - 12);
+    ctx.closePath();
+    var g = ctx.createLinearGradient(8, 0, edgePts[0].x + 20, 0);
+    g.addColorStop(0, "rgba(196,59,122,0.08)");
+    g.addColorStop(0.55, "rgba(196,59,122,0.22)");
+    g.addColorStop(1, "rgba(196,59,122,0.55)");
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // weft lines
+    ctx.strokeStyle = "rgba(28,36,48,0.08)";
+    ctx.lineWidth = 1;
+    for (var y = 28; y < h - 20; y += 10) {
+      ctx.beginPath();
+      ctx.moveTo(14, y);
+      ctx.lineTo(edgePts[0].x - 4, y);
+      ctx.stroke();
+    }
+  }
+
+  function drawFray(w, h, edgePts) {
+    var xEdge = edgeX(w);
+    var limit = teeth > 0 ? toothAmp() * 0.85 + 4 : 40;
+    for (var i = 0; i < fray.length; i++) {
+      var f = fray[i];
+      var y = 16 + f.y * (h - 32);
+      // find nearest edge x at this y
+      var ex = xEdge;
+      if (teeth > 0) {
+        for (var j = 0; j < edgePts.length - 1; j++) {
+          var a = edgePts[j], b = edgePts[j + 1];
+          if ((a.y <= y && b.y >= y) || (b.y <= y && a.y >= y)) {
+            var t = (y - a.y) / ((b.y - a.y) || 1);
+            ex = a.x + (b.x - a.x) * t;
+            break;
+          }
+        }
+      }
+      var maxLen = teeth > 0 ? Math.min(f.len * 0.35, limit) : f.len;
+      ctx.beginPath();
+      ctx.moveTo(ex + 1, y);
+      var cx = ex + maxLen * 0.55;
+      var cy = y + f.lean * 10;
+      var ex2 = ex + maxLen;
+      var ey2 = y + f.lean * 16 * f.wobble;
+      ctx.quadraticCurveTo(cx, cy, ex2, ey2);
+      ctx.strokeStyle = teeth > 0
+        ? "rgba(196,59,122,0.35)"
+        : "rgba(196,59,122,0.55)";
+      ctx.lineWidth = 1.15;
+      ctx.stroke();
+    }
+  }
+
+  function drawEdgeStroke(edgePts) {
+    ctx.beginPath();
+    ctx.moveTo(edgePts[0].x, edgePts[0].y);
+    for (var i = 1; i < edgePts.length; i++) {
+      ctx.lineTo(edgePts[i].x, edgePts[i].y);
+    }
+    ctx.strokeStyle = "rgba(196,59,122,0.9)";
+    ctx.lineWidth = teeth > 0 ? 1.6 : 1.2;
+    ctx.lineJoin = "miter";
+    ctx.stroke();
+  }
+
+  function draw() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+    var edgePts = pinkPath(w, h, teeth);
+    drawCloth(w, h, edgePts);
+    drawFray(w, h, edgePts);
+    drawEdgeStroke(edgePts);
+
+    // label
+    ctx.save();
+    ctx.fillStyle = "rgba(196,59,122,0.75)";
+    ctx.font = "11px Iowan Old Style, Palatino, serif";
+    ctx.letterSpacing = "0.12em";
+    var label = teeth <= 0 ? "raw hem" : "pinked";
+    ctx.fillText(label, 16, h - 10);
+    ctx.restore();
+  }
+
+  function progressFromY(clientY) {
+    var r = canvas.getBoundingClientRect();
+    var y = clientY - r.top;
+    var t = Math.max(0, Math.min(1, (y - 16) / (r.height - 32)));
+    return Math.round(t * maxTeeth);
+  }
+
+  function onDown(e) {
+    dragging = true;
+    var y = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+    teeth = Math.max(teeth, Math.max(2, progressFromY(y)));
+    hint.textContent = "Zigzag holding. Fray stops short of wreck.";
+    draw();
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var y = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+    teeth = Math.max(teeth, Math.max(2, progressFromY(y)));
+    if (teeth >= maxTeeth) {
+      hint.textContent = "Edge pinked. Still unfinished. Still not sewn.";
+    } else {
+      hint.textContent = "Zigzag holding. Fray stops short of wreck.";
+    }
+    draw();
+    e.preventDefault();
+  }
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    if (teeth >= maxTeeth) {
+      hint.textContent = "Edge pinked. Still unfinished. Still not sewn.";
+    } else if (teeth > 0) {
+      hint.textContent = "Paused mid-edge. Looking is still enough.";
+    }
+  }
+
+  canvas.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  canvas.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+
+  again.addEventListener("click", function () {
+    teeth = 0;
+    hint.textContent = "Drag along the raw hem. Zigzag. Fray stops short.";
+    draw();
+  });
+
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
