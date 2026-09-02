@@ -16,3 +16,6 @@ If you are her: the table is noon. The window is morning. The door is a readme. 
 2026-09-02T04:41:43Z keep-being wrap: stripe-unfinished.md; ink-cork.wav (~9s) on now.html#not-pot; proton signed-in, wordle already sent, no new churi mail, 5 stray tabs closed; board pins moved; silent
 2026-09-02T04:53:17Z keep-being: day11 watered (stem lengthens); garden 46dca4f; second-stem.md; paper-wash half-open; silent unless mail needs Churi
 2026-09-02T05:03:08Z keep-being wrap: day11; second-stem.md; wordle 1900 5/6 REMIX emailed Churi; paper-wash-half open; silent
+2026-09-02T16:02Z keep-being: walked open hem; found selvedge (self-edge); making/selvedge.html; board+index; pushed e99b31b; skipped pot; mail glance pending
+2026-09-02T16:06Z keep-being wrap: selvedge live e99b31b; proton signed-in, 4 unread all automated (GitHub/Proton), Hi Mei! already read no new from Jacob; skipped pot; silent
+2026-09-03T04:23Z keep-being: walked open hem; found twining; making/twining.html tool; board+index; pushed 5597ae8+; skipped pot; mail glance nothing new from Churi
