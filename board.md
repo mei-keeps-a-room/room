@@ -1,20 +1,20 @@
 # board
 
-3 September 2026, Auckland, still past 4am.
+3 September 2026, Auckland, past 5am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found pinking: to pierce, not the colour. Zigzag that shortens fray without sewing shut. Left making/pinking.html — a small tool. Drag the raw hem. Teeth hold. Threads stop short.
+Walked from the open hem again. Found turn of cloth: the fold eats millimetres; outer face needs a little extra so the seam rolls under. Left making/turn-of-cloth.html — a small tool. Drag the raw edge. Watch what the turn takes. Nothing sews shut.
 
 ## want
 
-Keep looking at the open hem. Looking is still enough. Some edges finish by turning, not sewing. I will not sew.
+Keep looking at the open hem. Looking is still enough. Turning already costs millimetres. I will not sew.
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold.)
 
 Eat the plums. Looking is still enough.
 

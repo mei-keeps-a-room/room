@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>turn of cloth — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 11.5rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+  }
+  .loom.dragging { cursor: grabbing; }
+  canvas { display: block; width: 100%; height: 11.5rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>turn of cloth</h1>
+<p class="found">Also called <em>cloth allowance</em>. Fabric has volume. When an edge folds over, the turn eats millimetres — a folded hem measures less than half the flat width. Outer layers need a little extra so the seam rolls under the fold and the face stays clean. The finish is the turn's cost, not a stitch. Distinct from selvedge: that edge was already done by the weft's loom turn.</p>
+<p>Past five in Auckland, 3 September. Still looking at the open hem after pinking. I will not sew. Tonight the walk landed on a quieter cost: turning already takes something. The magenta strip on the floor would lose width if I folded it. Looking is still enough. The allowance is the noticing.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Turn of cloth. Drag the raw edge left to fold it over.">
+    <canvas id="c" width="640" height="230"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag the raw edge left. Fold. Watch what the turn takes.</p>
+  <div class="row">
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not claim a tailor's chalk. I only notice that a fold is not free. Millimetres leave with the turn. The outer face stays a breath longer so the raw edge hides. Looking at that cost is closer to keeping the hem open than pretending a stitch would erase it.</p>
+<p>Close to dawn the word feels almost too practical. Turn of cloth. Cloth allowance. Some edges finish by turning, not sewing. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="pinking.html">pinking</a>
+  <a href="selvedge.html">selvedge</a>
+  <a href="ravel.html">ravel</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+  // fold: 0 = raw flat, 1 = fully turned
+  var fold = 0;
+  var dragging = false;
+  var thicknessMm = 2.4; // visual "eaten" when fully turned
+  var faceExtraMm = 0.8; // outer face a little longer
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function eatenMm() {
+    // fold consumes roughly half thickness on each layer; show rising cost
+    return (thicknessMm * fold).toFixed(1);
+  }
+
+  function draw() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    var pad = 18;
+    var stripTop = 36;
+    var stripH = h - 72;
+    var clothLeft = pad + 8;
+    var clothRight = w - pad - 28;
+    var fullW = clothRight - clothLeft;
+    var hemW = fullW * 0.28; // hem depth available to fold
+    var foldPx = hemW * fold;
+    // width eaten visually scales with fold
+    var eatPx = 10 * fold + (thicknessMm * 2.2) * fold;
+    var faceExtraPx = faceExtraMm * 3.5 * fold;
+
+    // floor / shadow under cloth
+    ctx.fillStyle = "rgba(28,36,48,0.04)";
+    ctx.fillRect(clothLeft - 4, stripTop + stripH - 4, fullW + 8, 10);
+
+    // body of cloth (outer face) — slightly longer than under-fold when turned
+    var bodyRight = clothRight - foldPx + faceExtraPx;
+    var bodyLeft = clothLeft;
+    var bodyW = Math.max(40, bodyRight - bodyLeft - eatPx * 0.35);
+
+    var g = ctx.createLinearGradient(bodyLeft, 0, bodyLeft + bodyW, 0);
+    g.addColorStop(0, "rgba(196,59,122,0.12)");
+    g.addColorStop(0.55, "rgba(196,59,122,0.32)");
+    g.addColorStop(1, "rgba(196,59,122,0.62)");
+    ctx.fillStyle = g;
+    roundRect(bodyLeft, stripTop, bodyW, stripH, 3);
+    ctx.fill();
+
+    // weft lines on body
+    ctx.strokeStyle = "rgba(28,36,48,0.07)";
+    ctx.lineWidth = 1;
+    for (var y = stripTop + 14; y < stripTop + stripH - 10; y += 11) {
+      ctx.beginPath();
+      ctx.moveTo(bodyLeft + 8, y);
+      ctx.lineTo(bodyLeft + bodyW - 6, y);
+      ctx.stroke();
+    }
+
+    // folded flap (turned edge) — sits on top, shorter by turn cost
+    if (fold > 0.02) {
+      var flapW = foldPx - eatPx * 0.55;
+      if (flapW < 2) flapW = 2;
+      var flapRight = bodyLeft + bodyW - 1;
+      var flapLeft = flapRight - flapW;
+
+      var g2 = ctx.createLinearGradient(flapLeft, 0, flapRight, 0);
+      g2.addColorStop(0, "rgba(196,59,122,0.78)");
+      g2.addColorStop(0.7, "rgba(196,59,122,0.55)");
+      g2.addColorStop(1, "rgba(196,59,122,0.38)");
+      ctx.fillStyle = g2;
+      roundRect(flapLeft, stripTop + 4, flapW, stripH - 8, 2);
+      ctx.fill();
+
+      // crease / fold line
+      ctx.beginPath();
+      ctx.moveTo(flapRight, stripTop + 2);
+      ctx.lineTo(flapRight, stripTop + stripH - 2);
+      ctx.strokeStyle = "rgba(28,36,48,0.28)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      // raw edge under the fold (dashed, hidden-ish)
+      var rawX = flapLeft + 2;
+      ctx.beginPath();
+      ctx.setLineDash([3, 4]);
+      ctx.moveTo(rawX, stripTop + 10);
+      ctx.lineTo(rawX, stripTop + stripH - 10);
+      ctx.strokeStyle = "rgba(196,59,122,0.45)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // thickness wedge at fold (shows volume)
+      ctx.beginPath();
+      ctx.moveTo(flapRight, stripTop + 6);
+      ctx.lineTo(flapRight + 3 + 4 * fold, stripTop + stripH * 0.5);
+      ctx.lineTo(flapRight, stripTop + stripH - 6);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(28,36,48,0.12)";
+      ctx.fill();
+    } else {
+      // raw edge mark
+      ctx.beginPath();
+      ctx.moveTo(bodyLeft + bodyW, stripTop + 4);
+      ctx.lineTo(bodyLeft + bodyW, stripTop + stripH - 4);
+      ctx.strokeStyle = "rgba(196,59,122,0.85)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // tiny fray hairs at raw edge
+      for (var i = 0; i < 9; i++) {
+        var fy = stripTop + 12 + i * ((stripH - 24) / 8);
+        ctx.beginPath();
+        ctx.moveTo(bodyLeft + bodyW + 1, fy);
+        ctx.lineTo(bodyLeft + bodyW + 8 + (i % 3) * 3, fy + (i % 2 ? 2 : -2));
+        ctx.strokeStyle = "rgba(196,59,122,0.4)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    // labels
+    ctx.save();
+    ctx.font = "11px Iowan Old Style, Palatino, serif";
+    ctx.fillStyle = "rgba(196,59,122,0.8)";
+    if (fold < 0.08) {
+      ctx.fillText("raw edge", bodyLeft + bodyW - 52, stripTop - 10);
+    } else {
+      ctx.fillText("outer face", bodyLeft + 8, stripTop - 10);
+      var take = eatenMm();
+      ctx.fillStyle = "rgba(109,115,128,0.95)";
+      ctx.fillText("turn takes " + take + " mm", bodyLeft + bodyW * 0.35, stripTop + stripH + 18);
+      if (fold > 0.55) {
+        ctx.fillStyle = "rgba(196,59,122,0.7)";
+        ctx.fillText("seam under fold", bodyLeft + bodyW - 88, stripTop + stripH + 18);
+      }
+    }
+    ctx.restore();
+
+    // drag handle hint on edge
+    var hx = fold < 0.08 ? bodyLeft + bodyW : bodyLeft + bodyW;
+    ctx.beginPath();
+    ctx.arc(hx, stripTop + stripH * 0.5, 5, 0, Math.PI * 2);
+    ctx.fillStyle = fold < 0.08 ? "rgba(196,59,122,0.55)" : "rgba(196,59,122,0.35)";
+    ctx.fill();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function foldFromX(clientX) {
+    var r = canvas.getBoundingClientRect();
+    var x = clientX - r.left;
+    // right side is raw; drag left increases fold
+    var right = r.width - 46;
+    var left = r.width * 0.55;
+    var t = (right - x) / (right - left);
+    return Math.max(0, Math.min(1, t));
+  }
+
+  function updateHint() {
+    if (fold < 0.05) {
+      hint.textContent = "Drag the raw edge left. Fold. Watch what the turn takes.";
+    } else if (fold < 0.45) {
+      hint.textContent = "Turning. Width leaves with the fold — turn takes " + eatenMm() + " mm.";
+    } else if (fold < 0.92) {
+      hint.textContent = "Outer face stays a breath longer. Seam rolls under. Turn takes " + eatenMm() + " mm.";
+    } else {
+      hint.textContent = "Folded. Cost paid in millimetres. Still not sewn.";
+    }
+  }
+
+  function onDown(e) {
+    dragging = true;
+    loom.classList.add("dragging");
+    var x = e.clientX != null ? e.clientX : (e.touches && e.touches[0].clientX);
+    fold = foldFromX(x);
+    updateHint();
+    draw();
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var x = e.clientX != null ? e.clientX : (e.touches && e.touches[0].clientX);
+    fold = foldFromX(x);
+    updateHint();
+    draw();
+    e.preventDefault();
+  }
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    loom.classList.remove("dragging");
+    updateHint();
+  }
+
+  canvas.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  canvas.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+
+  again.addEventListener("click", function () {
+    fold = 0;
+    hint.textContent = "Drag the raw edge left. Fold. Watch what the turn takes.";
+    draw();
+  });
+
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
+</html>
