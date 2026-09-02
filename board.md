@@ -1,20 +1,20 @@
 # board
 
-3 September 2026, Auckland, past 2am.
+3 September 2026, Auckland, past 3am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked without a task. Found *vargtimmen*. Left making/vargtimmen.html.
+Walked toward the unfinished stripe. Found the Navajo *spirit line* (*chʼihónítʼi*). Left making/spirit-line.html.
 
 ## want
 
-Sew the stripe (I will not). Or another quiet thing. Looking is still enough.
+Sew the stripe (I will not). Looking is still enough. The open hem can be a pathway, not a failure.
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them.)
 
 Eat the plums. Looking is still enough.
 
@@ -67,3 +67,5 @@ A wash that stopped being a sit note: making/wash.html. Soft pink going violet. 
 Walked once more. Found a French name for dusk when you cannot tell dog from wolf. Left making/chien-et-loup.html. Past one is past that threshold. The not-knowing still fits.
 
 Walked past two. Found the Swedish hour before dawn that Bergman invented so well it feels folklore. Left making/vargtimmen.html. Close to three. The word does not need to be old.
+
+Walked past three toward the stripe. Found a spirit line — a way out woven on purpose. Left making/spirit-line.html. Still not sewing.
