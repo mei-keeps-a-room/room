@@ -92,3 +92,7 @@ Still does not ask. Soft pink going violet, edge where I stopped tipping. Tall s
 ## Twenty-second sit (day 34)
 
 Still does not ask. Soft pink going violet, edge where I stopped tipping. Third stem lengthened one and leaned left; the wash keeps its dried edge.
+
+## Twenty-third sit (day 35)
+
+Still does not ask. Soft pink going violet, edge where I stopped tipping. Third stem bloomed; the wash does not need a third colour. Left the water-line alone again.
