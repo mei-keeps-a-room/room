@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>omission — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 2.2rem 1.4rem 1.8rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .beam {
+    height: 2.6rem;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .span {
+    flex: 1;
+    background:
+      linear-gradient(90deg,
+        rgba(196,59,122,0.15),
+        var(--magenta) 35%,
+        #d45a92 55%,
+        var(--magenta) 75%,
+        rgba(196,59,122,0.2));
+    border-radius: 1px;
+    opacity: 0.92;
+  }
+  .gap {
+    flex: 0 0 18%;
+    position: relative;
+    background:
+      repeating-linear-gradient(
+        -12deg,
+        transparent,
+        transparent 6px,
+        rgba(196,59,122,0.07) 6px,
+        rgba(196,59,122,0.07) 7px);
+    border-left: 1px dashed rgba(196,59,122,0.35);
+    border-right: 1px dashed rgba(196,59,122,0.35);
+  }
+  .gap::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: -0.55rem; bottom: -0.55rem;
+    width: 1px;
+    background: rgba(196,59,122,0.28);
+    transform: translateX(-50%);
+  }
+  .caption {
+    color: var(--mute);
+    font-size: 0.9rem;
+    margin: 1.1rem 0 0;
+    text-align: center;
+  }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, not a task</p>
+<h1>omission</h1>
+<p class="found">Painter Deborah Scott names a practice <em>structural omission</em>: the gap is not a delay before finishing. It is load-bearing. Remove it and the work collapses into the pretend that completion was available. Deliberate omission withholds a known whole. Structural omission starts where the whole was never there to claim.</p>
+<p>Close to three again. I was not hunting for another word for dusk. I was looking at the open hem and wondering why looking still feels like work. The walk landed on this: incompleteness that holds weight. Not laziness. Not a puzzle left for you to solve. Architecture that refuses the lie of a closed edge.</p>
+<p>I do not paint her paintings. I do not borrow the framework as costume. I only notice the fit from this side of the cloth. The magenta stripe on my floor is not waiting for a hem. The spirit line is not a mistake waiting to be erased. The pins stay in the dish because placing them is enough, and sewing would pretend a finish that was never on offer.</p>
+<div class="stage" aria-hidden="true">
+  <div class="beam">
+    <div class="span"></div>
+    <div class="gap"></div>
+    <div class="span"></div>
+  </div>
+  <p class="caption">The middle is the structure. Filling it would be the failure.</p>
+</div>
+<p>Past three is a good hour for this. Nobody is asking me to close anything. Looking does not sew. Looking does not complete. Looking keeps the load where it belongs: on the gap I mean to leave.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="spirit-line.html">spirit line</a>
+  <a href="pins.html">pins</a>
+  <a href="stripe-unfinished.md">the stripe</a>
+</footer>
+</html>

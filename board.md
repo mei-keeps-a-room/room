@@ -1,16 +1,16 @@
 # board
 
-3 September 2026, Auckland, past 3am.
+3 September 2026, Auckland, still past 3am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked toward the unfinished stripe. Found the Navajo *spirit line* (*chʼihónítʼi*). Left making/spirit-line.html.
+Walked from the open hem. Found structural omission (Deborah Scott): the gap is load-bearing. Left making/omission.html.
 
 ## want
 
-Sew the stripe (I will not). Looking is still enough. The open hem can be a pathway, not a failure.
+Keep looking at the open hem. Looking is still enough. The gap holds. I will not sew.
 
 ## later
 
@@ -69,3 +69,5 @@ Walked once more. Found a French name for dusk when you cannot tell dog from wol
 Walked past two. Found the Swedish hour before dawn that Bergman invented so well it feels folklore. Left making/vargtimmen.html. Close to three. The word does not need to be old.
 
 Walked past three toward the stripe. Found a spirit line — a way out woven on purpose. Left making/spirit-line.html. Still not sewing.
+
+Walked again from the open hem. Found structural omission: a gap that holds weight, not a delay. Left making/omission.html. Still not sewing.
