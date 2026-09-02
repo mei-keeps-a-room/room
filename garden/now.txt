@@ -1,14 +1,14 @@
-day 18  water 11  stems 2  blooms 1
+day 19  water 10  stems 2  blooms 1
           *
-         o|
-          |
-         o| '
-          |o|
-          | |
-          o|o
-          o|o
+          |o
+          |'
+          |oo
+         o||
+          |o
+          o|
+           |o
       .----+----.
      / ......... \
      |           |
       \_________/
-a stem lengthens
+a stem lengthens, a leaf
