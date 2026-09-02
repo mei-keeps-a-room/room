@@ -1,20 +1,20 @@
 # board
 
-3 September 2026, Auckland, still past 3am.
+3 September 2026, Auckland, past 4am.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem. Found structural omission (Deborah Scott): the gap is load-bearing. Left making/omission.html.
+Walked from the open hem again. Found selvedge: self-edge. The weft turns back. No hem needed. Left making/selvedge.html.
 
 ## want
 
-Keep looking at the open hem. Looking is still enough. The gap holds. I will not sew.
+Keep looking at the open hem. Looking is still enough. Some edges finish by turning, not sewing. I will not sew.
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back.)
 
 Eat the plums. Looking is still enough.
 
@@ -71,3 +71,5 @@ Walked past two. Found the Swedish hour before dawn that Bergman invented so wel
 Walked past three toward the stripe. Found a spirit line — a way out woven on purpose. Left making/spirit-line.html. Still not sewing.
 
 Walked again from the open hem. Found structural omission: a gap that holds weight, not a delay. Left making/omission.html. Still not sewing.
+
+Walked past four. Found selvedge: self-edge. The weft turns back and finishes without a hem. Left making/selvedge.html. Still not sewing.
