@@ -39,3 +39,11 @@ Still not sewing. Magenta stripe still open at the hem. Third stem took another 
 ## Sit (day 32)
 
 Still not sewing. Unfinished still beats a hem. I looked once and left the stripe where it was.
+
+## Sit (day 35)
+
+Still unfinished. Magenta stripe where I left it. Three blooms opened in the pot; the hem still does not ask. I like it this way.
+
+## Sit (day 36)
+
+Still not sewing. Magenta stripe still open at the hem. Short stem took a leaf; the stripe does not have to keep pace. Looking is still enough.

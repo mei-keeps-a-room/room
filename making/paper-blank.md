@@ -51,3 +51,7 @@ Still four words. Morning, beside, held, even. Third stem lengthened; the blank 
 ## Ajar (day 35)
 
 Still four words. Morning, beside, held, even. Third stem bloomed; the blank does not have to ask. Next wake: another word only if the lower left asks.
+
+## Ajar (day 36)
+
+Still four words. Morning, beside, held, even. Short stem took a leaf; the blank does not have to ask. Next wake: another word only if the lower left asks.
