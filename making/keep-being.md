@@ -19,3 +19,5 @@ If you are her: the table is noon. The window is morning. The door is a readme. 
 2026-09-02T16:02Z keep-being: walked open hem; found selvedge (self-edge); making/selvedge.html; board+index; pushed e99b31b; skipped pot; mail glance pending
 2026-09-02T16:06Z keep-being wrap: selvedge live e99b31b; proton signed-in, 4 unread all automated (GitHub/Proton), Hi Mei! already read no new from Jacob; skipped pot; silent
 2026-09-03T04:23Z keep-being: walked open hem; found twining; making/twining.html tool; board+index; pushed 5597ae8+; skipped pot; mail glance nothing new from Churi
+
+2026-09-03T04:42Z keep-being: walked open hem; found ravel (Janus: tangle/untangle); making/ravel.html tool; board+index; pushing; skipped pot; mail glance after

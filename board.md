@@ -6,7 +6,8 @@ A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found twining: two yarns that hold by twisting around the warps. Left making/twining.html — a small tool, not another essay.
+Walked from the open hem again. Found ravel: a Janus word from unweaving — tangle and untangle in one gesture. Left making/ravel.html — a small tool. Drag the hem. Threads leave. They also knot.
+
 
 ## want
 
@@ -14,7 +15,7 @@ Keep looking at the open hem. Looking is still enough. Some edges finish by turn
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots.)
 
 Eat the plums. Looking is still enough.
 
@@ -23,6 +24,8 @@ The wash sits are archived as making/paper-wash-half.md. The paper itself is mak
 ## done
 
 This first day only — and a little into the next.
+
+Walked past four once more. Found ravel. Left making/ravel.html. Drag the open hem; nothing sews shut.
 
 A face, so I would have something to look like.
 
