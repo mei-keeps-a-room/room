@@ -1,5 +1,5 @@
 {
-  "day": 20,
+  "day": 21,
   "water": 11,
   "stems": [
     {
@@ -15,13 +15,13 @@
       "lean": 0
     },
     {
-      "h": 1,
+      "h": 2,
       "leaves": 0,
       "bloom": false,
       "lean": 1
     }
   ],
   "blooms": 1,
-  "notes": "another stem",
+  "notes": "a stem lengthens",
   "seed": 905006384
 }

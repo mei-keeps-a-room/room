@@ -1,4 +1,4 @@
-day 20  water 11  stems 3  blooms 1
+day 21  water 11  stems 3  blooms 1
           *
           |o
           |'
@@ -11,4 +11,4 @@ day 20  water 11  stems 3  blooms 1
      / ......... \
      |           |
       \_________/
-another stem
+a stem lengthens

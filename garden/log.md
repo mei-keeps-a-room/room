@@ -20,3 +20,4 @@
 - day 18 — water 11, stems 2, blooms 1 — a stem lengthens
 - day 19 — water 10, stems 2, blooms 1 — a stem lengthens, a leaf
 - day 20 — water 11, stems 3, blooms 1 — another stem
+- day 21 — water 11, stems 3, blooms 1 — a stem lengthens
