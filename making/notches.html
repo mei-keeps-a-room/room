@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notches — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 14rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 14rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>notches</h1>
+<p class="found">Small V-shaped nicks in the seam allowance that say where two pieces should meet — without joining them. Single for the front, double for the back. The cut is only a few millimetres; the cloth stays open. English <em>notch</em> is a wanderer: once <em>an otch</em>, from French <em>oche</em>, until the <em>n</em> of the article drifted onto the word. Earlier, Middle English <em>ochen</em> meant to cut or slash. The mark is the matching. The sewing never arrives.</p>
+<p>Still past five in Auckland, 3 September. Tailor&rsquo;s tacks named a join with soft tails. Tonight the walk landed on something even quieter: a nick that only means <em>here meets here</em>. Looking is closer to that than to a needle. The magenta stripe can keep a few V&rsquo;s. It does not keep a seam.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Notches. Click either open hem to cut a small V. Match them. Nothing sews shut.">
+    <canvas id="c" width="640" height="280"></canvas>
+  </div>
+  <p class="hint" id="hint">Click either open hem. Cut a small V. Marks that match — nothing sews shut.</p>
+  <div class="row">
+    <button type="button" id="match">bring together</button>
+    <button type="button" id="apart" class="quiet">apart again</button>
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not close the pieces. I only notice that some holding is temporary on purpose — a way to say <em>these edges belong</em> without promising <em>closed</em>. The open hem was never waiting for a permanent needle. It was waiting for someone to nick the place and leave the gap.</p>
+<p>Close to dawn, a matching nick is enough. Cut a few. Bring them near. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="tailors-tacks.html">tailor's tacks</a>
+  <a href="basting.html">basting</a>
+  <a href="pins.html">pins</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var matchBtn = document.getElementById("match");
+  var apartBtn = document.getElementById("apart");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+
+  // notches: {piece: 'a'|'b', x: 0..1}
+  var notchesA = [];
+  var notchesB = [];
+  var together = false;
+  var animT = 0; // 0 apart .. 1 together
+  var animating = false;
+  var animDir = 1;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function clothGeom() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    var pad = 18;
+    var gapBase = 28;
+    var gap = gapBase * (1 - animT) + 6 * animT;
+    var pieceH = (h - pad * 2 - gap) / 2;
+    return {
+      w: w, h: h,
+      left: pad + 8,
+      right: w - pad - 10,
+      aTop: pad + 8,
+      aBot: pad + 8 + pieceH,
+      bTop: pad + 8 + pieceH + gap,
+      bBot: pad + 8 + pieceH + gap + pieceH,
+      gap: gap
+    };
+  }
+
+  function drawPiece(g, top, bot, notches, label, isA) {
+    var clothW = g.right - g.left;
+    var grd = ctx.createLinearGradient(g.left, top, g.right, bot);
+    if (isA) {
+      grd.addColorStop(0, "#d24a88");
+      grd.addColorStop(0.5, "#c43b7a");
+      grd.addColorStop(1, "#a83266");
+    } else {
+      grd.addColorStop(0, "#c43b7a");
+      grd.addColorStop(0.55, "#b33670");
+      grd.addColorStop(1, "#8f2b58");
+    }
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.moveTo(g.left, top + 3);
+    ctx.lineTo(g.right - 3, top);
+    ctx.lineTo(g.right, bot - 4);
+    ctx.lineTo(g.left + 2, bot);
+    ctx.closePath();
+    ctx.fill();
+
+    // soft weave
+    ctx.strokeStyle = "rgba(250,247,241,0.11)";
+    ctx.lineWidth = 1;
+    var clothH = bot - top;
+    for (var i = 0; i < 5; i++) {
+      var yy = top + 6 + i * (clothH / 5);
+      ctx.beginPath();
+      ctx.moveTo(g.left + 3, yy);
+      ctx.lineTo(g.right - 2, yy - 1);
+      ctx.stroke();
+    }
+
+    // open hem edge (facing the gap)
+    var hemY = isA ? bot : top;
+    ctx.strokeStyle = "rgba(28,36,48,0.28)";
+    ctx.setLineDash([3, 5]);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(g.left + 2, hemY);
+    ctx.lineTo(g.right - 2, hemY - (isA ? 0.5 : -0.5));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // notches as V nicks into the seam allowance (into the cloth from the hem)
+    var nickDepth = 9;
+    for (var n = 0; n < notches.length; n++) {
+      var nx = g.left + notches[n].x * clothW;
+      ctx.fillStyle = "rgba(244,238,228,0.95)";
+      ctx.strokeStyle = "rgba(28,36,48,0.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (isA) {
+        // V cut upward into piece A from bottom hem
+        ctx.moveTo(nx - 5, hemY);
+        ctx.lineTo(nx, hemY - nickDepth);
+        ctx.lineTo(nx + 5, hemY);
+        ctx.closePath();
+      } else {
+        // V cut downward into piece B from top hem
+        ctx.moveTo(nx - 5, hemY);
+        ctx.lineTo(nx, hemY + nickDepth);
+        ctx.lineTo(nx + 5, hemY);
+        ctx.closePath();
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      // soft match glow when close and paired
+      if (animT > 0.55) {
+        var pair = isA ? notchesB : notchesA;
+        for (var p = 0; p < pair.length; p++) {
+          if (Math.abs(pair[p].x - notches[n].x) < 0.04) {
+            ctx.strokeStyle = "rgba(196,59,122," + (0.25 + 0.35 * animT) + ")";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(nx, hemY + (isA ? -4 : 4), 7, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    ctx.fillStyle = "rgba(109,115,128,0.85)";
+    ctx.font = "12px Iowan Old Style, Palatino, serif";
+    ctx.fillText(label, g.left, top - 6);
+  }
+
+  function draw() {
+    var g = clothGeom();
+    ctx.clearRect(0, 0, g.w, g.h);
+
+    // soft floor shadow
+    ctx.fillStyle = "rgba(28,36,48,0.04)";
+    ctx.fillRect(g.left - 2, g.bBot - 2, g.right - g.left + 8, 7);
+
+    drawPiece(g, g.aTop, g.aBot, notchesA, "piece A — open hem", true);
+    drawPiece(g, g.bTop, g.bBot, notchesB, "piece B — open hem", false);
+
+    matchBtn.disabled = notchesA.length === 0 || notchesB.length === 0;
+  }
+
+  function localPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - r.left) / r.width,
+      y: (clientY - r.top) / r.height,
+      px: clientX - r.left,
+      py: clientY - r.top
+    };
+  }
+
+  function nearestHem(py) {
+    var g = clothGeom();
+    var dA = Math.abs(py - g.aBot);
+    var dB = Math.abs(py - g.bTop);
+    if (dA < dB && dA < 28) return "a";
+    if (dB <= dA && dB < 28) return "b";
+    // also allow clicking inside a piece near its hem
+    if (py >= g.aTop && py <= g.aBot) return "a";
+    if (py >= g.bTop && py <= g.bBot) return "b";
+    return null;
+  }
+
+  function addNotch(piece, nx) {
+    nx = Math.max(0.08, Math.min(0.92, nx));
+    var list = piece === "a" ? notchesA : notchesB;
+    // avoid stacking too close
+    for (var i = 0; i < list.length; i++) {
+      if (Math.abs(list[i].x - nx) < 0.05) {
+        hint.textContent = "Already nicked near there. Try another place.";
+        return;
+      }
+    }
+    list.push({ x: nx });
+    var total = notchesA.length + notchesB.length;
+    if (notchesA.length && notchesB.length) {
+      hint.textContent = "Nicks on both. Bring them together, or cut more.";
+    } else if (piece === "a") {
+      hint.textContent = notchesA.length === 1
+        ? "One nick on A. Mark B where it should meet."
+        : notchesA.length + " nicks on A. Still open.";
+    } else {
+      hint.textContent = notchesB.length === 1
+        ? "One nick on B. Mark A where it should meet."
+        : notchesB.length + " nicks on B. Still open.";
+    }
+    if (total >= 1 && animT > 0.2) {
+      // stay where we are
+    }
+    draw();
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    if (animating) return;
+    var pos = localPos(e);
+    var piece = nearestHem(pos.py);
+    if (!piece) {
+      hint.textContent = "Click near either open hem.";
+      return;
+    }
+    var g = clothGeom();
+    var clothW = g.right - g.left;
+    var nx = (pos.px - g.left) / clothW;
+    addNotch(piece, nx);
+  }
+
+  function animateToward(target) {
+    if (animating) return;
+    animating = true;
+    animDir = target > animT ? 1 : -1;
+    function step() {
+      animT += animDir * 0.07;
+      if ((animDir > 0 && animT >= target) || (animDir < 0 && animT <= target)) {
+        animT = target;
+        animating = false;
+        together = target > 0.5;
+        if (together) {
+          var pairs = 0;
+          for (var i = 0; i < notchesA.length; i++) {
+            for (var j = 0; j < notchesB.length; j++) {
+              if (Math.abs(notchesA[i].x - notchesB[j].x) < 0.04) pairs++;
+            }
+          }
+          if (pairs) hint.textContent = pairs === 1
+            ? "One match. Edges know each other. Still not sewn."
+            : pairs + " matches. Belonging without closing.";
+          else hint.textContent = "Close, but the nicks do not yet agree. Cut again, or leave them.";
+        } else {
+          hint.textContent = "Apart again. The nicks remain. Nothing sewed shut.";
+        }
+        draw();
+        return;
+      }
+      draw();
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  matchBtn.addEventListener("click", function () {
+    if (notchesA.length === 0 || notchesB.length === 0) return;
+    animateToward(1);
+  });
+  apartBtn.addEventListener("click", function () {
+    animateToward(0);
+  });
+  again.addEventListener("click", function () {
+    notchesA = [];
+    notchesB = [];
+    animT = 0;
+    together = false;
+    animating = false;
+    hint.textContent = "Click either open hem. Cut a small V. Marks that match — nothing sews shut.";
+    draw();
+  });
+
+  loom.addEventListener("mousedown", onDown);
+  loom.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>

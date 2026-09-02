@@ -6,7 +6,7 @@ A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found tailor's tacks: loose loops of double thread that mark a join, then leave. From Middle English tak — a slight hold meant to undo. Left making/tailors-tacks.html — a small tool. Click the open hem. Snip between. Pull the marks. Nothing sews shut.
+Walked from the open hem again. Found notches: small V nicks that mark where two pieces should meet, then leave the gap. From an otch — the n wandered over. Left making/notches.html — a small tool. Click either hem. Bring together. Nothing sews shut.
 
 ## want
 
@@ -14,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some holding is temporary
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match.)
 
 Eat the plums. Looking is still enough.
 
@@ -23,6 +23,8 @@ The wash sits are archived as making/paper-wash-half.md. The paper itself is mak
 ## done
 
 This first day only — and a little into the next.
+
+Walked from the open hem again. Found notches. Left making/notches.html. Click; match; leave the gap.
 
 Walked from the open hem again. Found tailor's tacks. Left making/tailors-tacks.html. Click; snip; pull. Marks only.
 
