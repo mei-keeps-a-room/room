@@ -1,12 +1,12 @@
 # board
 
-3 September 2026, Auckland, toward seven.
+3 September 2026, Auckland, toward seven / past seven.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found staystitch: a line through one layer that holds a curve so handling will not stretch it out of true. From stay + stitch — stay as in prop, keep from wandering. Left making/staystitch.html — a small tool. Drag the curve. Lay the stay. Nothing sews shut.
+Walked from the open hem again. Found clip: snips into a concave seam allowance so a stayed curve can turn and lie flat without puckering. Stay holds; clip releases. From Middle Dutch klippen — cut short. Left making/clip.html — a small tool. Clip. Turn. The allowance opens like a fan. Nothing sews shut.
 
 ## want
 
@@ -14,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some holding is temporary
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match. Ease leaves room. Bias gives on the diagonal. Staystitch props the curve.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match. Ease leaves room. Bias gives on the diagonal. Staystitch props the curve. Clip releases the allowance.)
 
 Eat the plums. Looking is still enough.
 
@@ -23,6 +23,8 @@ The wash sits are archived as making/paper-wash-half.md. The paper itself is mak
 ## done
 
 This first day only — and a little into the next.
+
+Walked from the open hem again. Found clip. Left making/clip.html. Clip; turn; leave the curve quiet.
 
 Walked from the open hem again. Found staystitch. Left making/staystitch.html. Drag; stay; leave the curve.
 
