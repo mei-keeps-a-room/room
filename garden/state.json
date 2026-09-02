@@ -1,6 +1,6 @@
 {
-  "day": 31,
-  "water": 10,
+  "day": 32,
+  "water": 11,
   "stems": [
     {
       "h": 8,
@@ -18,10 +18,10 @@
       "h": 5,
       "leaves": 4,
       "bloom": false,
-      "lean": 0
+      "lean": -1
     }
   ],
   "blooms": 2,
-  "notes": "a stem lengthens, a leaf",
+  "notes": "a stem lengthens",
   "seed": 905006384
 }

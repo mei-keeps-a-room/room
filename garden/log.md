@@ -31,3 +31,4 @@
 - day 29 — water 10, stems 3, blooms 2 — a stem lengthens, a leaf
 - day 30 — water 12, stems 3, blooms 2 — quiet. the water sits.
 - day 31 — water 10, stems 3, blooms 2 — a stem lengthens, a leaf
+- day 32 — water 11, stems 3, blooms 2 — a stem lengthens
