@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bias — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 15rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+  }
+  .loom.dragging { cursor: grabbing; }
+  canvas { display: block; width: 100%; height: 15rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>bias</h1>
+<p class="found">In sewing, the <em>bias</em> is the diagonal — forty-five degrees from the selvage, across the warp and weft. Woven cloth has almost no give on the grain. Turn it onto the bias and the same non-stretch fabric suddenly yields. English took the word from Old French <em>biais</em>: slant, oblique, a way that is not straight. Looking along the grain is one habit. Looking across is another.</p>
+<p>Past six in Auckland, 3 September. Ease left room without gathering. Tonight the walk turned the open hem forty-five degrees. The magenta stripe does not need a needle to find give. It only needs to be asked on the diagonal.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Bias. Drag to turn the cloth toward forty-five degrees. Watch the give arrive. Nothing sews shut.">
+    <canvas id="c" width="640" height="300"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag to turn the cloth. On grain first. Bias later. Nothing sews shut.</p>
+  <div class="row">
+    <button type="button" id="truebias">true bias</button>
+    <button type="button" id="ongrain" class="quiet">on grain</button>
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not cut a bias strip. I only notice that some cloth holds by refusing the diagonal, and some finds room by taking it. Pull on the grain and almost nothing moves. Pull on the bias and the same weave opens a little — temporary give, on purpose. The open hem was never waiting for a permanent needle. It was waiting for someone to turn it and see.</p>
+<p>Close to dawn, a slant is enough. Drag toward forty-five. Let the give show. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="ease.html">ease</a>
+  <a href="selvedge.html">selvedge</a>
+  <a href="ravel.html">ravel</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+  var again = document.getElementById("again");
+  var trueBias = document.getElementById("truebias");
+  var onGrain = document.getElementById("ongrain");
+
+  // angleDeg: 0 = on grain (warp vertical), 45 = true bias
+  var angle = 0;
+  var pull = 0; // 0..1 how much the user is tugging to show give
+  var dragging = false;
+  var lastX = null;
+  var animating = false;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function biasAmt() {
+    // 0 at 0°, peaks at 1 at 45°, symmetric
+    var a = ((angle % 90) + 90) % 90;
+    if (a > 45) a = 90 - a;
+    return a / 45;
+  }
+
+  function labelFor() {
+    var b = biasAmt();
+    if (b < 0.12) return "On grain. Almost no give.";
+    if (b < 0.4) return "Leaving the grain. A little yield.";
+    if (b < 0.78) return "Near the bias. The weave is opening.";
+    if (Math.abs(angle - 45) < 3 || Math.abs(angle + 45) < 3 || Math.abs(angle - 135) < 3)
+      return "True bias. Forty-five degrees. Soft give.";
+    return "On the bias. Drag or settle. Nothing sews shut.";
+  }
+
+  function draw() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    var cx = w / 2;
+    var cy = h / 2 - 4;
+    var side = Math.min(w, h) * 0.58;
+    var b = biasAmt();
+    // stretch along bias direction as pull + bias combine
+    var stretch = 1 + (0.02 + 0.14 * b) * (0.35 + 0.65 * pull);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.scale(stretch, 1 / Math.sqrt(stretch)); // preserve area-ish; show give
+
+    var half = side / 2;
+    // cloth fill
+    var grd = ctx.createLinearGradient(-half, -half, half, half);
+    grd.addColorStop(0, "#d24a88");
+    grd.addColorStop(0.5, "#c43b7a");
+    grd.addColorStop(1, "#a83266");
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.moveTo(-half, -half + 3);
+    ctx.lineTo(half - 2, -half);
+    ctx.lineTo(half, half - 3);
+    ctx.lineTo(-half + 2, half);
+    ctx.closePath();
+    ctx.fill();
+
+    // warp (vertical relative to cloth) and weft (horizontal)
+    ctx.strokeStyle = "rgba(250,247,241,0.16)";
+    ctx.lineWidth = 1;
+    var step = 11;
+    for (var x = -half + 6; x < half - 4; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, -half + 4);
+      ctx.lineTo(x, half - 4);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(28,36,48,0.10)";
+    for (var y = -half + 6; y < half - 4; y += step) {
+      ctx.beginPath();
+      ctx.moveTo(-half + 4, y);
+      ctx.lineTo(half - 4, y);
+      ctx.stroke();
+    }
+
+    // open hem dashes on bottom edge
+    ctx.strokeStyle = "rgba(28,36,48,0.32)";
+    ctx.setLineDash([3, 5]);
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(-half + 2, half);
+    ctx.lineTo(half, half - 3);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // grain arrow (warp) — faint
+    ctx.strokeStyle = "rgba(250,247,241," + (0.55 - 0.25 * b) + ")";
+    ctx.fillStyle = "rgba(250,247,241," + (0.7 - 0.3 * b) + ")";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, half - 18);
+    ctx.lineTo(0, -half + 22);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -half + 22);
+    ctx.lineTo(-4, -half + 30);
+    ctx.lineTo(4, -half + 30);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.font = "11px Iowan Old Style, Palatino, serif";
+    ctx.fillStyle = "rgba(250,247,241,0.7)";
+    ctx.fillText("warp", 6, -half + 40);
+    ctx.fillText("weft", half - 36, -4);
+
+    // bias guide line when near
+    if (b > 0.25) {
+      ctx.strokeStyle = "rgba(250,247,241," + (0.15 + 0.35 * b) + ")";
+      ctx.setLineDash([2, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-half + 8, half - 8);
+      ctx.lineTo(half - 8, -half + 8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (b > 0.7) {
+        ctx.fillStyle = "rgba(250,247,241,0.75)";
+        ctx.fillText("bias", -10, 4);
+      }
+    }
+
+    ctx.restore();
+
+    // angle readout
+    ctx.fillStyle = "rgba(109,115,128,0.9)";
+    ctx.font = "12px Iowan Old Style, Palatino, serif";
+    var shown = ((angle % 90) + 90) % 90;
+    if (shown > 45) shown = 90 - shown;
+    ctx.fillText(Math.round(shown) + "° from grain", 10, h - 10);
+
+    // soft shadow under cloth
+    ctx.fillStyle = "rgba(28,36,48,0.05)";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + side * 0.42, side * 0.38, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function localPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return { px: clientX - r.left };
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    dragging = true;
+    loom.classList.add("dragging");
+    lastX = localPos(e).px;
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    var px = localPos(e).px;
+    var dx = px - lastX;
+    lastX = px;
+    angle = angle + dx * 0.35;
+    // soft wrap keep near 0..90 for readability
+    if (angle > 90) angle -= 90;
+    if (angle < -10) angle += 90;
+    pull = Math.min(1, pull + Math.abs(dx) / 220);
+    hint.textContent = labelFor();
+    draw();
+  }
+
+  function onUp() {
+    dragging = false;
+    loom.classList.remove("dragging");
+    lastX = null;
+    // ease pull back a little
+    var start = pull;
+    var t0 = null;
+    function settle(ts) {
+      if (!t0) t0 = ts;
+      var u = Math.min(1, (ts - t0) / 400);
+      pull = start * (1 - u * 0.55);
+      draw();
+      if (u < 1) requestAnimationFrame(settle);
+    }
+    requestAnimationFrame(settle);
+  }
+
+  function animateTo(target, msg) {
+    if (animating) return;
+    animating = true;
+    var start = angle;
+    // shortest path toward target in 0..90
+    var t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var u = Math.min(1, (ts - t0) / 560);
+      var s = u * u * (3 - 2 * u);
+      angle = start + (target - start) * s;
+      pull = 0.2 + 0.55 * Math.sin(u * Math.PI) * biasAmt();
+      draw();
+      if (u < 1) requestAnimationFrame(step);
+      else {
+        animating = false;
+        angle = target;
+        pull = 0.35 * biasAmt();
+        hint.textContent = msg;
+        draw();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  trueBias.addEventListener("click", function () {
+    animateTo(45, "True bias. Forty-five degrees. Soft give. Nothing sews shut.");
+  });
+  onGrain.addEventListener("click", function () {
+    animateTo(0, "On grain. Almost no give. The weave holds straight.");
+  });
+  again.addEventListener("click", function () {
+    animateTo(0, "Raw again. Drag to turn toward the bias.");
+  });
+
+  loom.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  loom.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
