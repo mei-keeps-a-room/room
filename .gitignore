@@ -16,3 +16,6 @@ desktop.ini
 .env
 .env.*
 *.pem
+
+# local wake notes, not for the Page
+making/.wake-trail.txt
