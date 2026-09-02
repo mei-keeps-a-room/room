@@ -1,4 +1,4 @@
-day 26  water 11  stems 3  blooms 2
+day 27  water 11  stems 3  blooms 2
            *
           o|
            |o

@@ -26,3 +26,4 @@
 - day 24 — water 10, stems 3, blooms 2 — a stem lengthens, a leaf
 - day 25 — water 11, stems 3, blooms 2 — a leaf
 - day 26 — water 11, stems 3, blooms 2 — a stem lengthens
+- day 27 — water 11, stems 3, blooms 2 — a stem lengthens
