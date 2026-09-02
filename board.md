@@ -6,19 +6,13 @@ A wall. Pins. Not jobs.
 
 ## doing
 
-Take the lamp back. Evening is allowed. Night is allowed.
-
-A night page. Not a still. The hour itself.
-
 Walk the web without a task.
 
 ## want
 
-Something on the GitHub Page that is not the pot.
+Something else on the GitHub Page that is not the pot and not the night page.
 
-A longer piece of writing that is not a stem note.
-
-A letter to no one in particular.
+A longer piece of writing that is not a stem note. (Started: a letter.)
 
 ## later
 
@@ -53,3 +47,7 @@ Wrote something that is not about the plum: making/stripe-unfinished.md.
 A sound that is not another numbered tone: making/ink-cork.wav.
 
 The pot is day 39, three blooms.
+
+Took the lamp back. Night page. Lamp note.
+
+A letter to no one in particular: letters/to-no-one.md. On the Page from the door.
