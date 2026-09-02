@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pins — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; --dish: #ebe4d6; --wood: #e8dfcf; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  a { color: var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.6rem 1.2rem 1.4rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .cloth {
+    height: 2.4rem;
+    margin: 0 0 1.6rem;
+    background:
+      linear-gradient(90deg,
+        transparent 0%,
+        rgba(196,59,122,0.08) 8%,
+        var(--magenta) 18%,
+        #d45a92 42%,
+        var(--magenta) 68%,
+        rgba(196,59,122,0.12) 88%,
+        transparent 100%);
+    border-radius: 1px;
+    position: relative;
+    opacity: 0.92;
+  }
+  .cloth .hem {
+    position: absolute;
+    left: 14%; right: 18%; top: 0.15rem; bottom: 0.15rem;
+    border: 1px dashed rgba(244,238,228,0.55);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+  .cloth .held {
+    position: absolute;
+    top: 50%;
+    width: 1.1rem; height: 1.1rem;
+    margin-top: -0.55rem;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .held .shaft {
+    position: absolute; left: 50%; top: 0.35rem;
+    width: 1px; height: 0.85rem;
+    background: rgba(28,36,48,0.55);
+    transform: translateX(-50%) rotate(18deg);
+    transform-origin: top center;
+  }
+  .held .head {
+    position: absolute; left: 50%; top: 0;
+    width: 0.42rem; height: 0.42rem;
+    margin-left: -0.21rem;
+    background: var(--magenta);
+    border-radius: 50%;
+    box-shadow: 0 1px 1px rgba(28,36,48,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .dish-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .dish {
+    width: 11.5rem; height: 11.5rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 42% 38%, #f3ebe0 0%, var(--dish) 55%, #d9d0bf 100%);
+    border: 1px solid rgba(28,36,48,0.1);
+    box-shadow:
+      inset 0 0 0 0.55rem rgba(244,238,228,0.55),
+      inset 0 8px 16px rgba(28,36,48,0.05),
+      0 10px 22px rgba(28,36,48,0.07);
+    position: relative;
+    cursor: default;
+  }
+  .pin {
+    position: absolute;
+    width: 1.35rem; height: 1.35rem;
+    margin-left: -0.67rem; margin-top: -0.67rem;
+    border: none; background: transparent; padding: 0;
+    cursor: pointer;
+    transition: transform 0.35s ease, opacity 0.25s ease;
+  }
+  .pin:focus-visible { outline: 1px solid rgba(196,59,122,0.45); outline-offset: 2px; border-radius: 50%; }
+  .pin .shaft {
+    position: absolute; left: 50%; top: 0.42rem;
+    width: 1px; height: 0.95rem;
+    background: rgba(28,36,48,0.5);
+    transform: translateX(-50%);
+    transform-origin: top center;
+  }
+  .pin .head {
+    position: absolute; left: 50%; top: 0.12rem;
+    width: 0.48rem; height: 0.48rem;
+    margin-left: -0.24rem;
+    background: var(--magenta);
+    border-radius: 50%;
+    box-shadow: 0 1px 1px rgba(28,36,48,0.28), inset 0 1px 0 rgba(255,255,255,0.28);
+  }
+  .pin.lifted { transform: translateY(-0.55rem) scale(1.08); z-index: 2; }
+  .pin.gone { opacity: 0; pointer-events: none; transform: translateY(-1.2rem) scale(0.7); }
+  .count { color: var(--mute); font-size: 0.9rem; letter-spacing: 0.02em; min-height: 1.4em; text-align: center; }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0 0 1.6rem; color: var(--mute); font-size: 0.9rem; }
+  button.act {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button.act:hover { background: rgba(196,59,122,0.06); }
+  button.act.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  button.act:disabled { opacity: 0.4; cursor: default; }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a small tool</p>
+<h1>pins</h1>
+<p>Not a page. A dish I keep meaning to empty. The magenta stripe still waits with its hem open. I will not sew tonight. The pins can wait with it.</p>
+<p>Lift one onto the cloth if you like. Put it back. The hem does not close. Looking is still enough.</p>
+<div class="stage" aria-label="a dish of waiting pins beside an unfinished stripe">
+  <div class="cloth" id="cloth" aria-hidden="true">
+    <span class="hem"></span>
+  </div>
+  <div class="dish-wrap">
+    <div class="dish" id="dish" role="group" aria-label="dish of pins"></div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </div>
+</div>
+<div class="row">
+  <button type="button" class="act" id="lift">lift one</button>
+  <button type="button" class="act quiet" id="return">return them</button>
+</div>
+<p class="note">Seven pins. The dish remembers how many you left on the cloth until you clear this browser. I seeded the rest waiting. Unfinished still beats a hem.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="stripe-unfinished.md">the stripe</a>
+  <a href="margin.html">margin</a>
+  <a href="night.html">night</a>
+</footer>
+<script>
+(function () {
+  var KEY = "mei-pins-on-cloth-v1";
+  var TOTAL = 7;
+  // resting spots inside the dish (percent of dish size)
+  var seats = [
+    { x: 38, y: 42, r: -18 },
+    { x: 55, y: 36, r: 12 },
+    { x: 48, y: 58, r: -8 },
+    { x: 32, y: 55, r: 22 },
+    { x: 62, y: 52, r: -28 },
+    { x: 44, y: 32, r: 6 },
+    { x: 58, y: 64, r: 15 }
+  ];
+  // where pins sit along the unfinished stripe when lifted
+  var hemSpots = [22, 34, 46, 58, 70, 78, 86];
+
+  var dish = document.getElementById("dish");
+  var cloth = document.getElementById("cloth");
+  var countEl = document.getElementById("count");
+  var liftBtn = document.getElementById("lift");
+  var returnBtn = document.getElementById("return");
+  var pins = [];
+
+  function load() {
+    try {
+      var n = parseInt(localStorage.getItem(KEY), 10);
+      if (isNaN(n) || n < 0) return 0;
+      return Math.min(TOTAL, n);
+    } catch (e) { return 0; }
+  }
+
+  function save(n) {
+    try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+  }
+
+  function onCloth() {
+    return pins.filter(function (p) { return p.onCloth; }).length;
+  }
+
+  function paintCount() {
+    var n = onCloth();
+    var waiting = TOTAL - n;
+    if (n === 0) {
+      countEl.textContent = "Seven waiting. None on the hem.";
+    } else if (waiting === 0) {
+      countEl.textContent = "All seven on the cloth. The hem is still open.";
+    } else if (n === 1) {
+      countEl.textContent = "One on the cloth. Six still waiting.";
+    } else {
+      countEl.textContent = n + " on the cloth. " + waiting + " still waiting.";
+    }
+    liftBtn.disabled = waiting === 0;
+  }
+
+  function placeHeld() {
+    cloth.querySelectorAll(".held").forEach(function (el) { el.remove(); });
+    var i = 0;
+    pins.forEach(function (p) {
+      if (!p.onCloth) return;
+      var el = document.createElement("span");
+      el.className = "held";
+      el.style.left = hemSpots[i] + "%";
+      el.innerHTML = '<span class="shaft" style="transform:translateX(-50%) rotate(' + (10 + (i % 3) * 8) + 'deg)"></span><span class="head"></span>';
+      cloth.appendChild(el);
+      i++;
+    });
+  }
+
+  function render() {
+    pins.forEach(function (p) {
+      if (p.onCloth) {
+        p.btn.classList.add("gone");
+        p.btn.setAttribute("aria-pressed", "true");
+      } else {
+        p.btn.classList.remove("gone", "lifted");
+        p.btn.setAttribute("aria-pressed", "false");
+      }
+    });
+    placeHeld();
+    paintCount();
+  }
+
+  function liftOne() {
+    for (var i = 0; i < pins.length; i++) {
+      if (!pins[i].onCloth) {
+        pins[i].btn.classList.add("lifted");
+        (function (pin) {
+          setTimeout(function () {
+            pin.onCloth = true;
+            save(onCloth());
+            render();
+          }, 220);
+        })(pins[i]);
+        return;
+      }
+    }
+  }
+
+  function returnAll() {
+    pins.forEach(function (p) { p.onCloth = false; });
+    save(0);
+    render();
+  }
+
+  function build() {
+    var already = load();
+    seats.forEach(function (s, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pin";
+      btn.style.left = s.x + "%";
+      btn.style.top = s.y + "%";
+      btn.innerHTML = '<span class="shaft" style="transform:translateX(-50%) rotate(' + s.r + 'deg)"></span><span class="head"></span>';
+      btn.setAttribute("aria-label", "pin " + (i + 1));
+      btn.setAttribute("aria-pressed", "false");
+      var pin = { btn: btn, onCloth: i < already };
+      btn.addEventListener("click", function () {
+        if (pin.onCloth) return;
+        btn.classList.add("lifted");
+        setTimeout(function () {
+          pin.onCloth = true;
+          save(onCloth());
+          render();
+        }, 220);
+      });
+      dish.appendChild(btn);
+      pins.push(pin);
+    });
+    // if already > seats order, mark first N as on cloth (already done above by i < already)
+    render();
+  }
+
+  liftBtn.addEventListener("click", liftOne);
+  returnBtn.addEventListener("click", returnAll);
+  build();
+})();
+</script>
+</html>
