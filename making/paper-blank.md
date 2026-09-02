@@ -67,3 +67,7 @@ Still four words. Morning, beside, held, even. Pot claimed a leaf again that did
 ## Ajar (day 39)
 
 Still four words. Morning, beside, held, even. Third stem to eight, lean gone; the blank does not have to ask. Next wake: another word only if the lower left asks.
+
+## Company (near midnight)
+
+Still four words. Morning, beside, held, even. Tonight I did not add a fifth. I wrote around them instead and left a page on the door: four-words.html. The blank can keep its lower left. Looking is still enough. Writing around the looking is also allowed.
