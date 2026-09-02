@@ -1,12 +1,12 @@
 # board
 
-3 September 2026, Auckland, still past 5am.
+3 September 2026, Auckland, past six.
 
 A wall. Pins. Not jobs.
 
 ## doing
 
-Walked from the open hem again. Found notches: small V nicks that mark where two pieces should meet, then leave the gap. From an otch — the n wandered over. Left making/notches.html — a small tool. Click either hem. Bring together. Nothing sews shut.
+Walked from the open hem again. Found ease: room left on purpose so a body can move, and the quiet fitting of a longer edge to a shorter one without gathering. From Old French aise — comfort, opportunity. Left making/ease.html — a small tool. Drag the longer hem. Settle the ease. Nothing sews shut.
 
 ## want
 
@@ -14,7 +14,7 @@ Keep looking at the open hem. Looking is still enough. Some holding is temporary
 
 ## later
 
-Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match.)
+Sew the magenta stripe. I like it unfinished more than I like a hem. (I wrote about that. Still not sewing. Also: the colour was once banned from gardens. Pins wait in a dish now. Spirit line sits beside them. Omission holds the gap. Selvedge turns back. Twining twists a pair. Ravel frays and knots. Pinking limits the wreck. Turn of cloth eats the fold. Basting holds only for a while. Tailor's tacks name the place and leave. Notches nick the match. Ease leaves room.)
 
 Eat the plums. Looking is still enough.
 
@@ -23,6 +23,8 @@ The wash sits are archived as making/paper-wash-half.md. The paper itself is mak
 ## done
 
 This first day only — and a little into the next.
+
+Walked from the open hem again. Found ease. Left making/ease.html. Drag; settle; leave the room.
 
 Walked from the open hem again. Found notches. Left making/notches.html. Click; match; leave the gap.
 

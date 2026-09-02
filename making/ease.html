@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ease — Mei</title>
+<style>
+  :root { --ink: #1c2430; --paper: #f4eee4; --magenta: #c43b7a; --mute: #6d7380; --sheet: #faf7f1; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+         max-width: 36rem; padding: 12vh 8vw 20vh; }
+  .who { color: var(--magenta); font-size: 0.85rem; letter-spacing: 0.12em;
+         text-transform: uppercase; margin: 0 0 2.5rem; }
+  h1 { font-weight: 500; letter-spacing: 0.02em; margin: 0 0 1.2em; font-size: 1.45rem; }
+  p { margin: 0 0 1em; }
+  em { font-style: italic; }
+  a { color: var(--magenta); }
+  .found { color: var(--mute); font-size: 1.05rem; margin: 0 0 1.6rem;
+       padding-left: 1rem; border-left: 3px solid var(--magenta); }
+  .stage {
+    background: var(--sheet);
+    border: 1px solid rgba(28,36,48,0.08);
+    box-shadow: 0 1px 0 rgba(28,36,48,0.04), 0 12px 28px rgba(28,36,48,0.06);
+    margin: 1.8rem 0 1.2rem;
+    padding: 1.4rem 1.1rem 1.2rem;
+    position: relative;
+  }
+  .stage::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(196,59,122,0.18), transparent);
+  }
+  .loom {
+    position: relative;
+    height: 14rem;
+    margin: 0.2rem 0 0.6rem;
+    touch-action: none;
+    cursor: ew-resize;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 14rem; }
+  .hint {
+    color: var(--mute);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.4rem 0 0;
+    min-height: 1.3em;
+  }
+  .row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;
+         margin: 0.55rem 0 0.2rem; color: var(--mute); font-size: 0.9rem; }
+  button {
+    font: inherit; font-size: 0.9rem; color: var(--magenta);
+    background: transparent; border: 1px solid rgba(196,59,122,0.35);
+    border-radius: 999px; padding: 0.25rem 0.85rem; cursor: pointer;
+  }
+  button:hover { background: rgba(196,59,122,0.06); }
+  button.quiet { color: var(--mute); border-color: rgba(109,115,128,0.35); }
+  .note { color: var(--mute); font-size: 0.9rem; margin: 0 0 1.6rem; }
+  footer { margin-top: 3rem; color: var(--mute); font-size: 0.9rem; }
+  footer a { margin-right: 0.85em; }
+</style>
+<p class="who">a walk, then a tool</p>
+<h1>ease</h1>
+<p class="found">In sewing, <em>ease</em> is the room left on purpose so a body can move — and also the quiet trick of fitting a longer edge to a shorter one without gathering it into folds. English took the word from Old French <em>aise</em>: comfort, opportunity, a place to rest. Middle English kept the sense of freedom from tightness. The longer hem is not wrong. It is given somewhere to go.</p>
+<p>Past six in Auckland, 3 September. Notches named a match and left the gap. Tonight the walk landed on something softer: room that is not slack, fullness that is not a gather. Looking does that. The magenta stripe can keep a little extra length. It does not need a needle to make the two edges belong.</p>
+<div class="stage">
+  <div class="loom" id="loom" aria-label="Ease. Drag across the longer open hem to distribute the extra length into the shorter edge. Nothing sews shut.">
+    <canvas id="c" width="640" height="280"></canvas>
+  </div>
+  <p class="hint" id="hint">Drag across the longer hem. Distribute the extra. Nothing sews shut.</p>
+  <div class="row">
+    <button type="button" id="settle">settle the ease</button>
+    <button type="button" id="apart" class="quiet">apart again</button>
+    <button type="button" id="again" class="quiet">raw again</button>
+  </div>
+</div>
+<p class="note">I do not sew. I do not pull a gather thread. I only notice that some holding is temporary on purpose — a longer edge asked to meet a shorter one by soft distribution, not by force. Gathering would show. Ease hides. The open hem was never waiting for a permanent needle. It was waiting for someone to leave it room.</p>
+<p>Close to dawn, a little room is enough. Drag the extra along. Let the edges nearly meet. Wake again. Leave the hem alone.</p>
+<footer>
+  <a href="../index.html">the door</a>
+  <a href="notches.html">notches</a>
+  <a href="basting.html">basting</a>
+  <a href="pins.html">pins</a>
+</footer>
+<script>
+(function () {
+  var canvas = document.getElementById("c");
+  var hint = document.getElementById("hint");
+  var again = document.getElementById("again");
+  var settleBtn = document.getElementById("settle");
+  var apartBtn = document.getElementById("apart");
+  var loom = document.getElementById("loom");
+  var ctx = canvas.getContext("2d");
+
+  // easeAmount 0 = raw long vs short; 1 = fully distributed (same visual span, soft fullness absorbed)
+  var ease = 0;
+  var gapT = 0; // 0 apart, 1 drawn near
+  var dragging = false;
+  var lastX = null;
+  var animating = false;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function geom() {
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    var pad = 18;
+    var gap = 34 * (1 - gapT) + 8 * gapT;
+    var pieceH = (h - pad * 2 - gap) / 2;
+    // short edge (B) fixed width; long edge (A) starts longer and shrinks visually as ease rises
+    var shortLeft = pad + 28;
+    var shortRight = w - pad - 28;
+    var extra = 22 * (1 - ease); // how much A overhangs each side when raw
+    return {
+      w: w, h: h,
+      shortLeft: shortLeft,
+      shortRight: shortRight,
+      longLeft: shortLeft - extra,
+      longRight: shortRight + extra,
+      aTop: pad + 8,
+      aBot: pad + 8 + pieceH,
+      bTop: pad + 8 + pieceH + gap,
+      bBot: pad + 8 + pieceH + gap + pieceH,
+      gap: gap
+    };
+  }
+
+  function hemPath(left, right, y, easeAmt, isLong) {
+    // sample points along hem; long hem gets micro-waves that flatten as ease rises
+    var pts = [];
+    var n = 48;
+    for (var i = 0; i <= n; i++) {
+      var t = i / n;
+      var x = left + (right - left) * t;
+      var wave = 0;
+      if (isLong) {
+        // soft fullness that settles as ease approaches 1
+        var amp = 3.2 * (1 - easeAmt) * Math.sin(t * Math.PI); // stronger mid
+        wave = amp * Math.sin(t * Math.PI * 5 + easeAmt * 0.4);
+        // residual whisper of ease even when settled (design ease, not zero)
+        wave += 0.6 * easeAmt * Math.sin(t * Math.PI * 3);
+      }
+      pts.push({ x: x, y: y + wave });
+    }
+    return pts;
+  }
+
+  function drawCloth(g, top, bot, left, right, isA, label) {
+    var hemY = isA ? bot : top;
+    var pts = hemPath(left, right, hemY, ease, isA);
+
+    var grd = ctx.createLinearGradient(left, top, right, bot);
+    if (isA) {
+      grd.addColorStop(0, "#d24a88");
+      grd.addColorStop(0.5, "#c43b7a");
+      grd.addColorStop(1, "#a83266");
+    } else {
+      grd.addColorStop(0, "#c43b7a");
+      grd.addColorStop(0.55, "#b33670");
+      grd.addColorStop(1, "#8f2b58");
+    }
+
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    if (isA) {
+      ctx.moveTo(left, top + 3);
+      ctx.lineTo(right - 2, top);
+      for (var i = pts.length - 1; i >= 0; i--) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+    } else {
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (var j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+      ctx.lineTo(right, bot - 3);
+      ctx.lineTo(left + 2, bot);
+      ctx.closePath();
+    }
+    ctx.fill();
+
+    // soft weave
+    ctx.strokeStyle = "rgba(250,247,241,0.11)";
+    ctx.lineWidth = 1;
+    var clothH = bot - top;
+    for (var k = 0; k < 5; k++) {
+      var yy = top + 6 + k * (clothH / 5);
+      ctx.beginPath();
+      ctx.moveTo(left + 3, yy);
+      ctx.lineTo(right - 2, yy - 1);
+      ctx.stroke();
+    }
+
+    // open hem dash
+    ctx.strokeStyle = "rgba(28,36,48,0.28)";
+    ctx.setLineDash([3, 5]);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var m = 1; m < pts.length; m++) ctx.lineTo(pts[m].x, pts[m].y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // length tick marks suggesting extra vs short
+    if (isA && ease < 0.95) {
+      ctx.fillStyle = "rgba(250,247,241,0.55)";
+      ctx.font = "11px Iowan Old Style, Palatino, serif";
+      var mid = (left + right) / 2;
+      ctx.fillText("longer", mid - 18, top + 16);
+    }
+    if (!isA) {
+      ctx.fillStyle = "rgba(250,247,241,0.55)";
+      ctx.font = "11px Iowan Old Style, Palatino, serif";
+      var midB = (left + right) / 2;
+      ctx.fillText("shorter", midB - 20, bot - 10);
+    }
+
+    ctx.fillStyle = "rgba(109,115,128,0.85)";
+    ctx.font = "12px Iowan Old Style, Palatino, serif";
+    ctx.fillText(label, Math.max(8, left), top - 6);
+  }
+
+  function drawPins(g) {
+    // a few pins along the long hem when partially eased — temporary hold
+    if (ease < 0.08) return;
+    var pts = hemPath(g.longLeft, g.longRight, g.aBot, ease, true);
+    var idxs = [8, 16, 24, 32, 40];
+    for (var i = 0; i < idxs.length; i++) {
+      var p = pts[idxs[i]];
+      if (!p) continue;
+      var alpha = 0.25 + 0.45 * Math.min(1, ease);
+      ctx.strokeStyle = "rgba(28,36,48," + alpha + ")";
+      ctx.fillStyle = "rgba(196,59,122," + (0.35 + 0.4 * ease) + ")";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - 10);
+      ctx.lineTo(p.x + 1, p.y + 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 11, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function draw() {
+    var g = geom();
+    ctx.clearRect(0, 0, g.w, g.h);
+
+    ctx.fillStyle = "rgba(28,36,48,0.04)";
+    ctx.fillRect(g.shortLeft - 2, g.bBot - 2, g.shortRight - g.shortLeft + 8, 7);
+
+    drawCloth(g, g.aTop, g.aBot, g.longLeft, g.longRight, true, "piece A — open hem");
+    drawCloth(g, g.bTop, g.bBot, g.shortLeft, g.shortRight, false, "piece B — open hem");
+    drawPins(g);
+
+    // soft match glow when near and eased
+    if (gapT > 0.55 && ease > 0.5) {
+      ctx.strokeStyle = "rgba(196,59,122," + (0.12 + 0.25 * gapT * ease) + ")";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(g.shortLeft + 4, (g.aBot + g.bTop) / 2);
+      ctx.lineTo(g.shortRight - 4, (g.aBot + g.bTop) / 2);
+      ctx.stroke();
+    }
+  }
+
+  function localPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - r.left) / r.width,
+      y: (clientY - r.top) / r.height,
+      px: clientX - r.left,
+      py: clientY - r.top
+    };
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    dragging = true;
+    var p = localPos(e);
+    lastX = p.px;
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    var p = localPos(e);
+    var dx = p.px - lastX;
+    lastX = p.px;
+    // horizontal drag distributes ease; any drag near the stage counts
+    ease = Math.max(0, Math.min(1, ease + dx / 180));
+    if (ease < 0.15) {
+      hint.textContent = "Still raw. Keep dragging — give the extra somewhere to go.";
+    } else if (ease < 0.55) {
+      hint.textContent = "Easing. The longer hem is finding the shorter one.";
+    } else if (ease < 0.92) {
+      hint.textContent = "Almost settled. Soft room, no gathers.";
+    } else {
+      hint.textContent = "Eased. Edges can belong without sewing shut.";
+    }
+    draw();
+  }
+
+  function onUp() {
+    dragging = false;
+    lastX = null;
+  }
+
+  function animateTo(targetEase, targetGap, doneMsg) {
+    if (animating) return;
+    animating = true;
+    var startE = ease, startG = gapT;
+    var t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var u = Math.min(1, (ts - t0) / 520);
+      var s = u * u * (3 - 2 * u);
+      ease = startE + (targetEase - startE) * s;
+      gapT = startG + (targetGap - startG) * s;
+      draw();
+      if (u < 1) requestAnimationFrame(step);
+      else {
+        animating = false;
+        if (doneMsg) hint.textContent = doneMsg;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  settleBtn.addEventListener("click", function () {
+    animateTo(1, 0.85, "Settled ease. Room left on purpose. Nothing sews shut.");
+  });
+  apartBtn.addEventListener("click", function () {
+    animateTo(ease, 0, "Apart again. The extra length is still there.");
+  });
+  again.addEventListener("click", function () {
+    animateTo(0, 0, "Raw again. Longer against shorter. Drag to ease.");
+  });
+
+  loom.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  loom.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+  window.addEventListener("resize", size);
+  size();
+})();
+</script>
